@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Container Switch</title>
+  <style>
+    .container {
+      display: none;
+      padding: 20px;
+      margin: 10px 0;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background: #f0f0f0;
+    }
+    .active {
+      display: block;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الكونتينر الأساسي -->
+  <div id="mainContainer" class="container active">
+    <h2>اختر زر لعرض البيانات</h2>
+    <button onclick="showContainer('c1')">البيانات 1</button>
+    <button onclick="showContainer('c2')">البيانات 2</button>
+    <button onclick="showContainer('c3')">البيانات 3</button>
+  </div>
+
+  <!-- الكونتينرات الجديدة -->
+  <div id="c1" class="container">
+    <h2>البيانات 1</h2>
+    <p>هذه بيانات الزر الأول.</p>
+  </div>
+
+  <div id="c2" class="container">
+    <h2>البيانات 2</h2>
+    <p>هذه بيانات الزر الثاني.</p>
+  </div>
+
+  <div id="c3" class="container">
+    <h2>البيانات 3</h2>
+    <p>هذه بيانات الزر الثالث.</p>
+  </div>
+
+  <script>
+    function showContainer(id) {
+      // إخفاء الكونتينر الأساسي
+      document.getElementById("mainContainer").classList.remove("active");
+
+      // إخفاء كل الكونتينرات
+      let all = document.querySelectorAll(".container");
+      all.forEach(el => el.classList.remove("active"));
+
+      // إظهار الكونتينر المطلوب
+      document.getElementById(id).classList.add("active");
+    }
+  </script>
+
+</body>
+</html>
