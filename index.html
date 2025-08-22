@@ -1,4 +1,4 @@
-u<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
@@ -903,7 +903,7 @@ u<!DOCTYPE html>
                             <div class="summary-value" id="delivery-time">--</div>
                         </div>
                     </div>
-                    
+
                     <div class="summary-card" id="rider-delay-card">
                         <div class="summary-icon">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -949,7 +949,15 @@ u<!DOCTYPE html>
                             <div class="summary-value" id="delay-rider-redispatched">--</div>
                         </div>
                     </div>
-
+                    <div class="summary-card" id="cancellation-reason-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Cancellation Reason <i class="fas fa-circle-info summary-info" title="Recommended cancellation reason based on delays."></i></div>
+                            <div class="summary-value" id="cancellation-reason">--</div>
+                        </div>
+                    </div>
             </div>
             <div id="additional-timeline-container">
                 <div class="panel">
@@ -1006,7 +1014,7 @@ u<!DOCTYPE html>
         </table>
     </div>
     <div id="cancellation-toast" style="display:none;position:fixed;top:40px;left:50%;transform:translateX(-50%);z-index:4000;min-width:320px;max-width:90vw;padding:22px 36px;background:#fff7f0;color:#ff5a00;font-size:1.25rem;font-weight:700;border-radius:14px;box-shadow:0 8px 32px rgba(255,90,0,0.18);text-align:center;transition:opacity 0.4s,transform 0.4s;"></div>
-    
+
   </div>
 
   <div id="c2" class="container">
@@ -1020,8 +1028,19 @@ u<!DOCTYPE html>
   </div>
 
   <script>
+    function showContainer(id) {
+      // إخفاء الكونتينر الأساسي
+      document.getElementById("mainContainer").classList.remove("active");
 
-document.addEventListener('DOMContentLoaded', function() {
+      // إخفاء كل الكونتينرات
+      let all = document.querySelectorAll(".container");
+      all.forEach(el => el.classList.remove("active"));
+
+      // إظهار الكونتينر المطلوب
+      document.getElementById(id).classList.add("active");
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
             const parseButton = document.getElementById('parse-button');
             const inputData = document.getElementById('input-data');
             const additionalInputData = document.getElementById('additional-input-data');
@@ -1271,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // First, try to extract estimated times from the raw text
                 // Note: This is disabled for table format to avoid conflicts
-                let isTableFormat = lines[0].includes('TIME') && lines[0].includes('EVENT');
+                let isTableFormat = lines.length > 0 && lines[0].includes('TIME') && lines[0].includes('EVENT');
                 if (!isTableFormat) {
                     for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
@@ -1301,13 +1320,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (!line) continue;
                         const cells = line.split(/\t|\s{2,}|\|/).map(cell => cell.trim()).filter(cell => cell !== '');
                         if (cells.length < 2) continue;
-                        
+
                         // Check if the event cell contains "Manual Undispatch"
                         let eventName = cells[1];
                         if (cells[1].toLowerCase().includes('manual undispatch')) {
                             eventName = 'Manual Undispatch';
                         }
-                        
+
                         // Extract estimated dropoff departure time from the last column if it exists
                         let estDropoffDeparture = null;
                         if (cells.length >= 8) { // Assuming Est.dropoff departure is the last column
@@ -1318,12 +1337,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 console.log(`Extracted dropoff departure for ${eventName}: ${estDropoffDeparture} from cell: "${lastCell}"`);
                             }
                         }
-                        
 
-                        
+
+
                         // Debug: Show all cells for this row
                         console.log(`Row ${i}: Time=${cells[0]}, Event=${eventName}, All cells:`, cells);
-                        
+
                         const lastEntry = parsedData[parsedData.length - 1];
                         if (!lastEntry || lastEntry.time !== cells[0] || lastEntry.event !== eventName) {
                             parsedData.push({
@@ -1532,14 +1551,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     let minutes = parseInt(twelveHourMatch[2], 10);
                     let seconds = twelveHourMatch[3] ? parseInt(twelveHourMatch[3], 10) : undefined;
                     let period = twelveHourMatch[4].toUpperCase();
-                    
+
                     // Convert to 12-hour display format
                     if (hours === 0) hours = 12;
                     else if (hours > 12) hours = hours % 12 || 12;
-                    
+
                     hours = hours.toString().padStart(2, '0');
                     minutes = minutes.toString().padStart(2, '0');
-                    
+
                     if (seconds !== undefined && !isNaN(seconds)) {
                         seconds = seconds.toString().padStart(2, '0');
                         return `${hours}:${minutes}:${seconds} ${period}`;
@@ -1595,14 +1614,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     let hours = parseInt(match[4], 10);
                     const minutes = parseInt(match[5], 10);
                     const period = match[6].toUpperCase();
-                    
+
                     // Convert to 24-hour format for calculation
                     if (period === 'PM' && hours !== 12) {
                         hours += 12;
                     } else if (period === 'AM' && hours === 12) {
                         hours = 0;
                     }
-                    
+
                     // Return time in standard format for timeToMinutes function
                     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
                 }
@@ -1672,7 +1691,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                     }
                 }
-                
+
                 // If not found in additional timeline, try to find "Picked up" in main timeline
                 if (!pickedUpAtTime) {
                     for (const item of mainData) {
@@ -1715,7 +1734,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let allDispatchPeriods = [];
                     let dispatchQueuedEvents = [];
                     let dispatchAcceptedEvents = [];
-                    
+
                     // Collect all Queued and Accepted events
                     for (const item of mainData) {
                         if (item.event.toLowerCase().includes('queue')) {
@@ -1732,16 +1751,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     }
-                    
+
                     // Sort events by time
                     dispatchQueuedEvents.sort((a, b) => a.minutes - b.minutes);
                     dispatchAcceptedEvents.sort((a, b) => a.minutes - b.minutes);
-                    
+
                     // For each Queued event, find the next chronological Accepted event
                     for (let i = 0; i < dispatchQueuedEvents.length; i++) {
                         const queuedEvent = dispatchQueuedEvents[i];
                         console.log(`Looking for Accepted event after ${queuedEvent.time}`);
-                        
+
                         // Find the next Accepted event that occurs after this Queued event
                         let matchingAccepted = null;
                         for (const acceptedEvent of dispatchAcceptedEvents) {
@@ -1751,11 +1770,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 break;
                             }
                         }
-                        
+
                         if (matchingAccepted) {
                             let timeDifference = matchingAccepted.minutes - queuedEvent.minutes;
                             if (timeDifference < 0) timeDifference += 1440; // Handle overnight cases
-                            
+
                             allDispatchPeriods.push({
                                 start: queuedEvent.minutes,
                                 end: matchingAccepted.minutes,
@@ -1763,22 +1782,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                 startTime: queuedEvent.time,
                                 endTime: matchingAccepted.time
                             });
-                            
+
                             console.log(`Found dispatch period: ${queuedEvent.time} to ${matchingAccepted.time} = ${timeDifference} minutes`);
                         }
                     }
-                    
+
                     // For dispatch time, use the longest individual period
                     allDispatchPeriods.sort((a, b) => b.duration - a.duration);
-                    
+
                     if (allDispatchPeriods.length > 0) {
                         const longestPeriod = allDispatchPeriods[0];
                         finalDispatchTime = longestPeriod.duration;
                         console.log(`Using longest dispatch period: ${longestPeriod.startTime} to ${longestPeriod.endTime} = ${longestPeriod.duration} minutes`);
                     }
-                    
+
                     console.log(`Total dispatch time calculated: ${finalDispatchTime} minutes`);
-                    
+
                     if (finalDispatchTime > 0) {
                         dispatchTimeDiv.textContent = formatTimeDifference(finalDispatchTime);
                     } else {
@@ -1816,12 +1835,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         const nearPickupMinutes = timeToMinutes(firstNearPickupTime);
                         const committedMinutes = pickUpCommittedTime ? timeToMinutes(pickUpCommittedTime) : Infinity;
                         const updatedMinutes = pickUpUpdatedTime ? timeToMinutes(pickUpUpdatedTime) : Infinity;
-                        
+
                         console.log('=== RIDER DELAY CALCULATION ===');
                         console.log('Near Pickup time:', firstNearPickupTime, '=', nearPickupMinutes, 'minutes');
                         console.log('Pickup - Committed time:', pickUpCommittedTime, '=', committedMinutes, 'minutes');
                         console.log('Pickup - Updated time:', pickUpUpdatedTime, '=', updatedMinutes, 'minutes');
-                        
+
                         // If Near Pickup is before either Pickup - Committed or Pickup - Updated, set delay to 0
                         if (nearPickupMinutes <= committedMinutes || nearPickupMinutes <= updatedMinutes) {
                             riderDelayTime = 0;
@@ -1841,7 +1860,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const parsedCurrentTime = parseCurrentTimeFormat(currentTime);
                         if (parsedCurrentTime) {
                             const currentMinutes = timeToMinutes(parsedCurrentTime);
-                            
+
                             // Find the last Accepted event time
                             let acceptedTime = null;
                             for (let i = mainData.length - 1; i >= 0; i--) {
@@ -1851,7 +1870,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     break;
                                 }
                             }
-                            
+
                             if (acceptedTime) {
                                 const acceptedMinutes = timeToMinutes(acceptedTime);
                                 riderDelayTime = currentMinutes - acceptedMinutes;
@@ -1863,7 +1882,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }
                     }
-                    
+
                     if (firstNearPickupTime || riderDelayTime > 0) {
                         riderDelayDiv.textContent = formatTimeDifference(riderDelayTime);
                     } else {
@@ -1874,7 +1893,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let totalRedispatchedDelay = 0;
                     let acceptedEvents = [];
                     let queuedEvents = [];
-                    
+
                     // Collect all Accepted and Queued events with their times
                     for (const item of mainData) {
                         if (item.event.toLowerCase().includes('accepted')) {
@@ -1891,38 +1910,38 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     }
-                    
+
                     // Sort events by time
                     acceptedEvents.sort((a, b) => a.minutes - b.minutes);
                     queuedEvents.sort((a, b) => a.minutes - b.minutes);
-                    
+
                     // Calculate all delays between Accepted events and subsequent Queued events
                     if (acceptedEvents.length > 0 && queuedEvents.length > 0) {
                         console.log('Calculating redispatched delays for all Accepted-Queued pairs...');
-                        
+
                         // For each Accepted event, find the next Queued event that comes after it
                         for (let i = 0; i < acceptedEvents.length; i++) {
                             const acceptedEvent = acceptedEvents[i];
                             console.log(`Looking for Queued event after ${acceptedEvent.time} (${acceptedEvent.minutes} minutes)`);
-                            
+
                             // Find the next Queued event after this Accepted event
                             for (let j = 0; j < queuedEvents.length; j++) {
                                 const queuedEvent = queuedEvents[j];
-                                
+
                                 if (queuedEvent.minutes > acceptedEvent.minutes) {
                                     let delay = queuedEvent.minutes - acceptedEvent.minutes;
                                     if (delay < 0) delay += 1440;
-                                    
+
                                     console.log(`Found delay: ${acceptedEvent.time} to ${queuedEvent.time} = ${delay} minutes`);
                                     totalRedispatchedDelay += delay;
                                     break; // Move to next Accepted event
                                 }
                             }
                         }
-                        
+
                         console.log(`Total redispatched delay: ${totalRedispatchedDelay} minutes`);
                     }
-                    
+
                     // Debug: Log the events found
                     console.log('=== DEBUG INFO ===');
                     console.log('Accepted events:', acceptedEvents);
@@ -1930,20 +1949,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Total delay:', totalRedispatchedDelay);
                     console.log('Number of Accepted events:', acceptedEvents.length);
                     console.log('Number of Queued events:', queuedEvents.length);
-                    
+
                     // Debug: Log the main data to see what's being parsed
                     console.log('Main data:', mainData);
-                    
+
                     // Debug: Check each item individually
                     for (const item of mainData) {
                         console.log('Event:', item.event, 'Time:', item.time, 'Contains accepted:', item.event.toLowerCase().includes('accepted'), 'Contains queued:', item.event.toLowerCase().includes('queued'), 'Contains manual undispatch:', item.event.toLowerCase().includes('manual undispatch'));
                     }
-                    
+
                     // Debug: Show the calculation process
                     console.log('=== CALCULATION PROCESS ===');
                     console.log('Using new logic for multiple Accepted events');
                     console.log('Final total delay:', totalRedispatchedDelay);
-                    
+
                     // If no queued events found, check the original input for Manual Undispatch
                     if (queuedEvents.length === 0) {
                         console.log('No queued events found, checking original input...');
@@ -1966,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }
                     }
-                    
+
                     if (totalRedispatchedDelay > 0) {
                         delayRiderRedispatchedDiv.textContent = formatTimeDifference(totalRedispatchedDelay);
                         // Also update the "Order picked up/another rider" value
@@ -1998,13 +2017,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 break;
                             }
                         }
-                        
+
                         // If still not found, try to extract from the original input text
                         if (!estDropoffArrivalTime) {
                             console.log('Trying to extract from original input...');
                             const originalInput = inputData.value;
                             const lines = originalInput.split('\n');
-                            
+
                             for (let i = 0; i < lines.length; i++) {
                                 const line = lines[i];
                                 if (line.toLowerCase().includes('accepted')) {
@@ -2032,7 +2051,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (delayToDropoff < -720) delayToDropoff += 1440;
                             if (delayToDropoff > 720) delayToDropoff -= 1440;
                             delayToDropoff = Math.max(0, delayToDropoff);
-                            
+
                             console.log('=== RIDER DELAY TO DROPOFF CALCULATION ===');
                             console.log('Manual estimated dropoff departure time:', manualEstDropoff);
                             console.log('Estimated dropoff minutes:', estDropoffMinutes);
@@ -2041,7 +2060,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.log('Current minutes:', currentMinutes);
                             console.log('Raw delay calculation:', currentMinutes - estDropoffMinutes);
                             console.log('Final delay:', delayToDropoff);
-                            
+
                             riderDelayDropoffDiv.textContent = formatTimeDifference(delayToDropoff);
                         } else {
                             riderDelayDropoffDiv.textContent = 'Invalid current time format';
@@ -2083,7 +2102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (selectedOrderType === 'nfv' && scheduledTime) {
                         const scheduledMinutes = timeToMinutes(scheduledTime);
                         let referenceMinutes = null;
-                        
+
                         if (firstQueuedTimeForScheduled) {
                             // If there's a Queued event, use that as reference
                             referenceMinutes = timeToMinutes(firstQueuedTimeForScheduled);
@@ -2103,7 +2122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             nfvDelay = referenceMinutes - scheduledMinutes;
                             console.log(`NFV order: Scheduled to Pickup Committed delay calculated: ${nfvDelay} minutes`);
                         }
-                        
+
                         if (nfvDelay < 0) nfvDelay += 1440;
                         if (nfvDelay > 0) {
                             console.log(`NFV order: Final preparation delay: ${nfvDelay} minutes`);
@@ -2137,6 +2156,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     additionalTimelineContainer.classList.remove('visible');
                 }
 
+                // Add Rider Pickup Analysis calculation
+                let beforeCommitted = '--';
+                let afterCommitted = '--';
+                if (firstNearPickupTime && pickUpCommittedTime) {
+                    const nearPickupMinutes = timeToMinutes(firstNearPickupTime);
+                    const committedMinutes = timeToMinutes(pickUpCommittedTime);
+                    let difference = nearPickupMinutes - committedMinutes;
+                    if (difference < -720) difference += 1440;
+                    if (difference > 720) difference -= 1440;
+                    if (difference <= 0) {
+                        beforeCommitted = formatTimeDifference(-difference);
+                        afterCommitted = '0 minutes';
+                    } else {
+                        afterCommitted = formatTimeDifference(difference);
+                        beforeCommitted = '0 minutes';
+                    }
+                    document.getElementById('rider-pickup-analysis').style.display = 'block';
+                }
+                document.getElementById('before-committed-time').textContent = beforeCommitted;
+                document.getElementById('after-committed-time').textContent = afterCommitted;
+
                 // Calculate Long Dispatching using the same logic as main dispatch time
                 let longDispatchingSum = finalDispatchTime; // Use the corrected calculation
                 document.getElementById('long-dispatching-value').textContent = `(${formatTimeDifference(longDispatchingSum)})`;
@@ -2163,7 +2203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let riderLatePickupSum = riderDelay || 0;
                 document.getElementById('rider-late-pickup-value').textContent = `(${formatTimeDifference(riderLatePickupSum)})`;
 
-            
+
 
                 // Rider is late to Drop Off (Rider Delay to Dropoff)
                 let delayDropoff = parseMinutesFromSummary('rider-delay-dropoff');
@@ -2171,7 +2211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Restaurant Waiting Time calculation (using pickup committed or near pickup based on rider arrival)
                 let waitingTime = null;
-                
+
                 // Check if there's a Queued event after Near Pickup (indicating dispatch issue, not restaurant issue)
                 let hasQueuedAfterNearPickup = false;
                 if (firstNearPickupTime) {
@@ -2187,17 +2227,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 }
-                
+
                 // Only calculate restaurant delay if there's no Queued event after Near Pickup
                 if (!hasQueuedAfterNearPickup) {
                 // Try to calculate using actual pickup time if available
                 if (pickedUpAtTime) {
                     const pickedUpMinutes = timeToMinutes(pickedUpAtTime);
-                    
+
                         if (pickUpCommittedTime && firstNearPickupTime) {
                         const committedMinutes = timeToMinutes(pickUpCommittedTime);
                             const nearPickupMinutes = timeToMinutes(firstNearPickupTime);
-                            
+
                             if (nearPickupMinutes <= committedMinutes) {
                                 // Case 1: Rider arrived BEFORE or AT committed time
                                 waitingTime = pickedUpMinutes - committedMinutes;
@@ -2216,13 +2256,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const parsedCurrentTime = parseCurrentTimeFormat(currentTime);
                     if (parsedCurrentTime) {
                         const currentMinutes = timeToMinutes(parsedCurrentTime);
-                        
+
                             // Determine reference time based on rider arrival vs committed time
                         let referenceTime = null;
                             if (pickUpCommittedTime && firstNearPickupTime) {
                                 const committedMinutes = timeToMinutes(pickUpCommittedTime);
                                 const nearPickupMinutes = timeToMinutes(firstNearPickupTime);
-                                
+
                                 if (nearPickupMinutes <= committedMinutes) {
                                     // Rider arrived BEFORE or AT committed time - use committed time
                                     referenceTime = pickUpCommittedTime;
@@ -2235,7 +2275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else if (firstNearPickupTime) {
                             referenceTime = firstNearPickupTime;
                         }
-                        
+
                         if (referenceTime) {
                             const referenceMinutes = timeToMinutes(referenceTime);
                             waitingTime = currentMinutes - referenceMinutes;
@@ -2249,7 +2289,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const estPickupArrivalMinutes = timeToMinutes(estPickupArrivalTime);
                     const committedMinutes = timeToMinutes(pickUpCommittedTime);
                     const nearPickupMinutes = timeToMinutes(firstNearPickupTime);
-                    
+
                     // Compare Estimated Pickup Arrival with Committed Pickup Time
                     if (estPickupArrivalMinutes <= committedMinutes) {
                         // Estimated Pickup Arrival ≤ Committed Pickup Time
@@ -2260,7 +2300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Calculate delay from Estimated Pickup Arrival to Near Pickup event
                         waitingTime = estPickupArrivalMinutes - nearPickupMinutes;
                     }
-                    
+
                     // Ensure positive value
                     if (waitingTime < 0) waitingTime = 0;
                 }
@@ -2268,7 +2308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 else if (!waitingTime && pickUpCommittedTime && firstNearPickupTime) {
                     const committedMinutes = timeToMinutes(pickUpCommittedTime);
                     const nearPickupMinutes = timeToMinutes(firstNearPickupTime);   
-                    
+
                     if (nearPickupMinutes < committedMinutes) {
                         // Use committed time as reference
                         waitingTime = committedMinutes - nearPickupMinutes;
@@ -2289,7 +2329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log(`NFV order: Set preparation delay to ${nfvDelay} minutes (Scheduled to Queued) - no other preparation delay available`);
                     }
                 }
-                
+
                 console.log(`Final waitingTime check: waitingTime = ${waitingTime}`);
                 if (waitingTime !== null && waitingTime >= 0) {
                     waitingTimeDiv.textContent = formatTimeDifference(waitingTime);
@@ -2345,13 +2385,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         toast.style.opacity = '0';
                         toast.style.transform = 'translateX(-50%) scale(0.95)';
                         setTimeout(() => { toast.style.display = 'none'; }, 400);
-                    }, 50000);
+                    }, 5000);
                 }
                 function updateCancellationReason() {
                     let cancellationReason = '--';
                     if (unprofessionalOverride) {
                         cancellationReason = 'Unprofessional Behaviour';
+                        document.getElementById('cancellation-reason').textContent = cancellationReason;
                         showCancellationToast(cancellationReason);
+                        animateCancellationReason();
                         return;
                     }
                     // Get all delay values
@@ -2379,6 +2421,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Maximum delay:', maxDelay, 'minutes, Reason:', maxDelayObj ? maxDelayObj.label : 'None');
                     if (!maxDelayObj || maxDelay === 0) {
                         cancellationReason = '--';
+                        document.getElementById('cancellation-reason').textContent = cancellationReason;
                         showCancellationToast(cancellationReason);
                         return;
                     }
@@ -2409,7 +2452,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         cancellationReason = '--';
                     }
                     console.log('Final cancellation reason:', cancellationReason);
+                    document.getElementById('cancellation-reason').textContent = cancellationReason;
                     showCancellationToast(cancellationReason);
+                    animateCancellationReason();
                 }
 
                 // Attach Unprofessional Behaviour button logic
@@ -2421,29 +2466,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCancellationReason();
             }
 
-            // Add this helper function:
             function animateCancellationReason() {
                 const card = document.getElementById('cancellation-reason-card');
-                card.classList.remove('cancellation-pop');
-                void card.offsetWidth; // trigger reflow
-                card.classList.add('cancellation-pop');
-                setTimeout(() => card.classList.remove('cancellation-pop'), 900);
+                if (card) {
+                    card.classList.remove('cancellation-pop');
+                    void card.offsetWidth; // trigger reflow
+                    card.classList.add('cancellation-pop');
+                    setTimeout(() => card.classList.remove('cancellation-pop'), 900);
+                }
             }
         });
 
-
-    function showContainer(id) {
-      // إخفاء الكونتينر الأساسي
-      document.getElementById("mainContainer").classList.remove("active");
-
-      // إخفاء كل الكونتينرات
-      let all = document.querySelectorAll(".container");
-      all.forEach(el => el.classList.remove("active"));
-
-      // إظهار الكونتينر المطلوب
-      document.getElementById(id).classList.add("active");
-    }
   </script>
 
 </body>
 </html>
+```
