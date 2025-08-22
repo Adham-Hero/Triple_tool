@@ -763,8 +763,250 @@
 
   <!-- الكونتينرات الجديدة -->
   <div id="c1" class="container">
-    <h2>البيانات 1</h2>
-    <p>هذه بيانات الزر الأول.</p>
+      <div class="app-header">
+            <h1 class="app-title">Late Owner <span>Cancellation</span> Calculator</h1>
+            <p class="slogan">Late? Relax. We Know Who's Guilty</p>
+            <button id="dark-mode-toggle" title="Toggle dark mode"><i class="fas fa-moon"></i> <span>Dark Mode</span></button>
+        </div>
+        <div class="instructions">
+            <div class="instruction-header">
+                <i class="fas fa-lightbulb instruction-icon"></i>
+                <h3 class="instruction-title">How to Use This Tool <i class="fas fa-circle-info" style="font-size:1.1rem;cursor:pointer;" id="help-modal-btn" title="More help"></i></h3>
+            </div>
+            <ol>
+                <li>Paste your main timeline data into the first text area below.</li>
+                <li>Paste your additional timeline data (Ordered at, Send to restaurant) into the second text area.</li>
+                <li>Select the rider status, enter the delivery time, and select the order type below the text areas.</li>
+                <li>Click <b>Generate Timeline</b> to view both timelines, total dispatching time, and total waiting time at the restaurant, etc.</li>
+            </ol>
+            <div class="instruction-note">
+                <i class="fas fa-info-circle note-icon"></i>
+                <p>This tool detects delivery milestones, calculates dispatching time, and determines delay reasons based on dispatching, rider availability, partner preparation, or reassignment to another rider.</p>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Input Your Data</h2>
+            </div>
+            <div class="input-area" style="align-items: flex-start;">
+                <div id="delay-summary" style="min-width:220px;max-width:260px;margin-right:18px;background:#fff;border-radius:14px;box-shadow:var(--card-shadow);padding:22px 18px 18px 18px;display:flex;flex-direction:column;gap:16px;">
+                    <h3 style="font-size:1.1rem;font-weight:700;color:var(--primary-dark);margin-bottom:10px;">Delay Reasons</h3>
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        <li>
+                            <i class="fas fa-clock" style="color:var(--primary);margin-right:8px;"></i>
+                            Long Dispatching <span class="delay-value" id="long-dispatching-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-motorcycle" style="color:#8e44ad;margin-right:8px;"></i>
+                            Rider is late to Pick Up <span class="delay-value" id="rider-late-pickup-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-utensils" style="color:#e67e22;margin-right:8px;"></i>
+                            Late preparation from the restaurant <span class="delay-value" id="late-prep-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt" style="color:#e74c3c;margin-right:8px;"></i>
+                            Rider is late to Drop Off (late delivery) <span class="delay-value" id="late-dropoff-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-box" style="color:#27ae60;margin-right:8px;"></i>
+                            Order picked up/another rider <span class="delay-value" id="order-picked-up-value"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="input-container">
+                    <label for="input-data">Main Timeline Data <i class="fas fa-circle-info" title="Paste the main timeline (e.g. 11:34 PM **Queued**) here."></i></label>
+                    <div class="utility-buttons">
+                        <button id="example-main-btn" title="Insert example main timeline"><i class="fas fa-magic"></i> Example</button>
+                        <button id="clear-main-btn" title="Clear main timeline"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+                    <textarea id="input-data" placeholder="Paste your main timeline data here (11:34 PM **Queued**)" autocomplete="off"></textarea>
+                </div>
+                <div class="input-container">
+                    <label for="additional-input-data">Additional Timeline Data <i class="fas fa-circle-info" title="Paste additional timeline (e.g. Ordered at, Send to restaurant) here."></i></label>
+                    <div class="utility-buttons">
+                        <button id="example-additional-btn" title="Insert example additional timeline"><i class="fas fa-magic"></i> Example</button>
+                        <button id="clear-additional-btn" title="Clear additional timeline"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+                    <textarea id="additional-input-data" placeholder="Paste your additional timeline data here (Ordered at\n13:44 PM)" autocomplete="off"></textarea>
+                </div>
+            </div>
+            <div class="button-group" id="rider-status-group">
+                <button class="status-button" data-status="reachable" title="Rider is reachable">Rider Reachable</button>
+                <button class="status-button" data-status="unreachable" title="Rider is unreachable">Rider Unreachable</button>
+            </div>
+            <div class="input-group">
+                <label for="current-time-input">Current Time <i class="fas fa-circle-info" title="Enter current time in format: 24.07.2025, 08:49 AM"></i></label>
+                <input type="text" id="current-time-input" class="delivery-time-input" placeholder="24.07.2025, 08:49 AM" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="est-dropoff-input">Estimated Dropoff Departure <i class="fas fa-circle-info" title="Enter estimated dropoff departure time (e.g. 01:56 PM)"></i></label>
+                <input type="text" id="est-dropoff-input" class="delivery-time-input" placeholder="01:56 PM" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="delivery-time-input">Delivery Time (minutes) <i class="fas fa-circle-info" title="Enter the total delivery time in minutes."></i></label>
+                <input type="number" id="delivery-time-input" class="delivery-time-input" placeholder="15" min="1" max="300" step="1">
+            </div>
+            <div class="button-group" style="margin-bottom:0; margin-top: 0;">
+                <button id="unprofessional-btn" class="status-button" style="background:#e74c3c;color:#fff;"><i class="fas fa-user-slash"></i> Order Marked As Delivered</button>
+            </div>
+            <div class="button-group" id="order-type-group">
+                <button class="status-button" data-type="normal" title="Normal order">Normal Order</button>
+                <button class="status-button" data-type="nfv" title="NFV order">NFV</button>
+            </div>
+            <div class="button-group" style="margin-bottom:0;">
+                <button id="parse-button" title="Generate timeline"><i class="fas fa-bolt"></i> Generate Timeline</button>
+                <button id="reset-btn" title="Reset all fields" style="background:#bbb;color:#fff;"><i class="fas fa-rotate-left"></i> Reset</button>
+            </div>
+        </div>
+        <div id="timeline-tab">
+            <div id="result-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Main Event Timeline</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="result-table">
+                            <thead>
+                                <tr>
+                                    <th width="30%">Time</th>
+                                    <th width="70%">Event</th>
+                                </tr>
+                            </thead>
+                            <tbody id="result-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="summary-card" id="dispatch-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Dispatch Time <i class="fas fa-circle-info summary-info" title="Time from Queued to Dispatched."></i></div>
+                            <div class="summary-value" id="dispatch-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="waiting-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Restaurant Waiting Time <i class="fas fa-circle-info summary-info" title="Time the rider waited at the restaurant."></i></div>
+                            <div class="summary-value" id="waiting-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="delivery-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Delivery Time <i class="fas fa-circle-info summary-info" title="Total delivery time (input)."></i></div>
+                            <div class="summary-value" id="delivery-time">--</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card" id="rider-delay-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Rider Delay <i class="fas fa-circle-info summary-info" title="Rider arrived before committed pickup time."></i></div>
+                            <div class="summary-value" id="rider-delay">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="pick-updated-variance-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Pick Updated Time Variance <i class="fas fa-circle-info summary-info" title="Difference between committed and updated pickup times."></i></div>
+                            <div class="summary-value" id="pick-updated-variance">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="rider-delay-dropoff-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Rider Delay to Dropoff <i class="fas fa-circle-info summary-info" title="Delay past the Near Dropoff time, compared to current time."></i></div>
+                            <div class="summary-value" id="rider-delay-dropoff">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="scheduled-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Scheduled Time <i class="fas fa-circle-info summary-info" title="Time from Scheduled to first Queued event."></i></div>
+                            <div class="summary-value" id="scheduled-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="delay-rider-redispatched-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Delay rider - redispatched <i class="fas fa-circle-info summary-info" title="Difference from Est. pickup arrival that appears in the Accepted event to the time for the Near Pick up event, Queued event in case of redispatched."></i></div>
+                            <div class="summary-value" id="delay-rider-redispatched">--</div>
+                        </div>
+                    </div>
+
+            </div>
+            <div id="additional-timeline-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Additional Timeline</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="additional-timeline-table">
+                            <thead>
+                                <tr>
+                                    <th width="70%">Event</th>
+                                    <th width="30%">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="additional-timeline-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="fab-btn" id="fab-generate" title="Generate Timeline"><i class="fas fa-bolt"></i><span>Generate</span></button>
+        <div class="footer">
+            © 2025 Betto | Delivery Timeline Tool v2.1 | <a href="#" id="help-modal-btn-footer" style="color:var(--primary);text-decoration:underline;">Help</a>
+        </div>
+    </div>
+    <div class="spinner-overlay" id="spinner-overlay">
+        <i class="fas fa-spinner spinner"></i>
+    </div>
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="help-modal-close">×</span>
+            <h2><i class="fas fa-circle-info"></i> Help & FAQ</h2>
+            <ul>
+                <li><b>What is this tool?</b> <br>It helps you analyze delivery event timelines and identify delays or issues.</li>
+                <li><b>How do I use it?</b> <br>Paste your main and additional timeline data, select options, and click Generate Timeline.</li>
+                <li><b>What formats are supported?</b> <br>Times like <code>11:34 PM **Queued**</code> or table format. Additional timeline: <code>Ordered at 13:44 PM</code>.</li>
+                <li><b>What do the summary cards mean?</b> <br>Hover the <i class="fas fa-circle-info"></i> icons for explanations.</li>
+                <li><b>How do I copy or download results?</b> <br>Use the Copy or Download buttons below the results.</li>
+                <li><b>Need more help?</b> <br>Contact: <a href="mailto:betto@example.com">betto@example.com</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="rider-pickup-analysis" style="position:fixed;top:120px;right:32px;z-index:1200;width:270px;background:#fff;border-radius:12px;box-shadow:0 4px 18px rgba(255,90,0,0.10);padding:18px 16px 16px 16px;display:none;">
+        <h3 style="font-size:1.08rem;font-weight:700;color:var(--primary-dark);margin-bottom:10px;">Rider Pickup Analysis</h3>
+        <table style="width:100%;font-size:0.98rem;">
+            <tr>
+                <td>Arrived <b>Before</b> Committed</td>
+                <td id="before-committed-time">--</td>
+            </tr>
+            <tr>
+                <td>Arrived <b>After</b> Committed</td>
+                <td id="after-committed-time">--</td>
+            </tr>
+        </table>
+    </div>
+    <div id="cancellation-toast" style="display:none;position:fixed;top:40px;left:50%;transform:translateX(-50%);z-index:4000;min-width:320px;max-width:90vw;padding:22px 36px;background:#fff7f0;color:#ff5a00;font-size:1.25rem;font-weight:700;border-radius:14px;box-shadow:0 8px 32px rgba(255,90,0,0.18);text-align:center;transition:opacity 0.4s,transform 0.4s;"></div>
+    
   </div>
 
   <div id="c2" class="container">
