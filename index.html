@@ -2378,8 +2378,307 @@
   </div>
 
   <div id="c2" class="container">
-    <h2>البيانات 2</h2>
-    <p>هذه بيانات الزر الثاني.</p>
+   <div class="main-container">
+      <button
+        id="darkModeToggle"
+        class="dark-mode-toggle"
+        title="Toggle dark mode"
+      >
+        🌙
+      </button>
+      <div class="container">
+        <div class="header">
+          <h2>Talabat Delay Calculator</h2>
+          <button class="reset-form-btn" onclick="resetFormFields(0)">
+            Reset
+          </button>
+        </div>
+
+        <label for="chatStart">Chat Start Time:</label>
+        <input type="text" id="chatStart" placeholder="21.01.2025, 05:10 PM" />
+
+        <label for="orderPlacing">Order Placing Time:</label>
+        <input
+          type="text"
+          id="orderPlacing"
+          placeholder="Apr 19, 2025 05:18 PM or 21.01.2025, 04:50 PM"
+        />
+
+        <label for="orderDelivery">Delivery Time (in minutes):</label>
+        <input type="number" id="orderDelivery" placeholder="75" />
+
+        <div class="service-selection">
+          <div class="service-option">
+            <input type="checkbox" id="tmp" name="compGroup" value="tmp" />
+            <label for="tmp">TMP</label>
+          </div>
+          <div class="service-option">
+            <input type="checkbox" id="tgo" name="compGroup" value="tgo" />
+            <label for="tgo">TGO & Tmart</label>
+          </div>
+        </div>
+        <div id="fvNfvSelection" style="display: none; margin-bottom: 15px">
+          <label style="font-weight: 600">Order Type:</label>
+          <div class="order-type-selection">
+            <input type="radio" id="fv" name="orderType" value="fv" />
+            <label for="fv" class="order-type-option">FV & tMart</label>
+            <input type="radio" id="nfv" name="orderType" value="nfv" />
+            <label for="nfv" class="order-type-option">NFV</label>
+          </div>
+        </div>
+        <div class="required-message" id="serviceRequiredMsg">
+          * Please select a service type
+        </div>
+
+        <button
+          id="calculateBtn"
+          onclick="calculateDelay()"
+          disabled
+          style="display: none"
+        >
+          Check Order Status
+        </button>
+        <div id="result"></div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd" />
+
+        <label for="orderIdInput">Order ID to Follow:</label>
+        <input type="text" id="orderIdInput" placeholder="Enter Order ID" />
+        <button onclick="startCountdown()">Start 10-min Countdown</button>
+        <div id="orderTimers"></div>
+      </div>
+
+      <div id="compensation">
+        <h3>⚠ Required Compensation</h3>
+        <ul>
+          <li>Marked As Delieverd Order >=10</li>
+        </ul>
+        <button id="copyCompensationBtn" onclick="copyCompensationText()">
+          Compensation Script 📋
+        </button>
+      </div>
+
+      <div id="failedTrials" class="failed-trials show">
+        <h3>📵 Failed Trials</h3>
+        <ul>
+          <li>All Circutes are busy</li>
+          <li>Silent Call</li>
+          <li>
+            Error Message (Wrong/Incomplete number) - use the backup prefix
+          </li>
+          <li>Beep once tone - use the backup prefix</li>
+          <li>Call dropped</li>
+        </ul>
+      </div>
+
+      <div id="thirdReminder" class="third-reminder">
+        <div class="emoji">🚨</div>
+        <h3>FINAL WARNING!</h3>
+        <p><strong>Requires Compensation</strong></p>
+        <p>Time Left: <span id="timeLeft">15:00</span></p>
+        <p>If delayed during chat till Closure</p>
+      </div>
+
+      <div id="rightReminder" class="right-reminder">
+        <div class="emoji">📞</div>
+        <h3 id="callAction">Call Action</h3>
+        <div class="paper" id="callMessage"></div>
+      </div>
+
+      <div id="timeCalculator" class="time-calculator">
+        <h3>Add 10 Minutes</h3>
+        <label for="endTimeInput">End Time (Ex, 10:25 AM):</label>
+        <input type="text" id="endTimeInput" placeholder="10:25 AM" />
+        <button id="timeCalcBtn" onclick="calculateNewTime()">Calculate</button>
+        <div id="timeCalcResult"></div>
+        <div id="timeCalcResetCountdown"></div>
+      </div>
+
+      <div id="timeCalcReminder" class="time-calc-reminder">
+        <p>Add it on HeroCare - inform CST</p>
+      </div>
+
+      <div id="timeCalcServiceMessage" class="time-calc-service-message">
+        <p id="serviceMessageContent"></p>
+      </div>
+
+      <div id="refundSlaPanel" class="refund-sla-panel show">
+        <h3>Refund SLA</h3>
+        <select id="paymentMethodSelect" onchange="showRefundSlaDetails()">
+          <option value="" disabled selected>Select Payment Method</option>
+          <option value="CreditCardKNet">
+            Credit Card/K-Net (All Countries except Egypt and Oman)
+          </option>
+          <option value="CreditCardEgypt">Credit Card (Egypt)</option>
+          <option value="Qpay">Qpay (Qatar)</option>
+          <option value="Benefit">Benefit (Bahrain)</option>
+          <option value="ApplePay">Apple Pay (All Countries)</option>
+          <option value="CreditCardOman">Credit Card (Oman)</option>
+        </select>
+        <div id="refundSlaDetails" class="refund-sla-details">
+          <p id="compensationScript"></p>
+        </div>
+      </div>
+
+      <div class="marquee">
+        <div class="marquee-text">
+          🚨 If the delay on RST Contact Driver Should be (restaurant hasn't
+          started preparing the food) Check Late Owner 🚨 Refresh the Hurrier
+          every now and then 🚨 If the amount more than (180AED) in UAE (No
+          Refund/No partial refund/No compensation) send the case to EXPO 🚨
+          Contact drivers - Customer asks about refund: Refund query, Refund
+          action taken by you: Refund request 🚨Online Payment Issues -- First
+          contact from customer: Online Payment Issue 🚨| Customer contacted
+          before SLA: Follow up on existing case 🚨| Case needs to go to R&V
+          team: Online Payment Issue 🚨| Case already with R&V team: Follow up
+          on existing case 🚨| Customer unaware of incomplete order: Online
+          Payment Issue 🚨| Voucher Issues: Customer aware order was incomplete:
+          Voucher already used 🚨| Customer not eligible: Voucher already used
+          🚨| Customer didn't receive voucher: Voucher not received 🚨
+        </div>
+      </div>
+
+      <div id="compReasonAnimatedPopup" class="comp-reason-animated-popup">
+        <div class="comp-reason-popup-content">
+          <h3>Compensation Reason</h3>
+          <div id="compReasonPopupText"></div>
+          <div
+            id="compReasonPopupContact"
+            style="margin-top: 16px; font-size: 1.1em; color: #444"
+          ></div>
+          <button
+            id="closeCompReasonPopup"
+            title="Close"
+            style="
+              margin-top: 12px;
+              padding: 6px 18px;
+              border-radius: 8px;
+              background: #ff6200;
+              color: #fff;
+              border: none;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div id="contactDriverPopup" class="contact-driver-popup">
+        <div class="contact-driver-popup-content">
+          <h3>Contact Driver Scenarios</h3>
+          <div style="margin-bottom: 18px; text-align: left">
+            <b>ETA is stuck or increasing (TGO):</b>
+            <div style="font-size: 0.98em; margin-bottom: 10px">
+              The customer gets in touch as the time to wait to be delivered is
+              stuck or increasing.<br />Restaurant informed us that the delivery
+              time will be increased
+            </div>
+            <b
+              >Order will not be processed (Cancellation action was already
+              taken from Restaurant / Talabat / Customers):</b
+            >
+            <div style="font-size: 0.98em">
+              The customer wants to check the order status and the vendor cannot
+              proceed with the order - Order Declined / Cancelled by the
+              Restaurant or by Talabat<br />Order Cancelled by Sheild and the
+              customer wasn't aware that the order was already cancelled<br />Customer
+              Cancelled his order from his end and wants to confirm that the
+              order is cancelled (Not asking about refunds)
+            </div>
+          </div>
+          <button
+            id="closeContactDriverPopup"
+            style="
+              margin-top: 12px;
+              padding: 6px 18px;
+              border-radius: 8px;
+              background: #ff6200;
+              color: #fff;
+              border: none;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div id="smsCstPopup" class="sms-cst-popup">
+        <div class="sms-cst-popup-content">
+          <h3>SMS to send to CST in case unreachable</h3>
+          <div style="margin-bottom: 18px; text-align: left">
+            <b>Delay in order delivery:</b>
+            <div style="font-size: 0.98em; margin-bottom: 10px">
+              The restaurant informed us that the order will be delayed.
+            </div>
+            <b>The order is being prepared:</b>
+            <div style="font-size: 0.98em; margin-bottom: 10px">
+              The restaurant informed us that they are preparing the order at
+              the moment.
+            </div>
+            <b>The order is on the way:</b>
+            <div style="font-size: 0.98em">
+              The restaurant informed us that the order is being delivered.
+            </div>
+          </div>
+          <button
+            id="closeSmsCstPopup"
+            style="
+              margin-top: 12px;
+              padding: 6px 18px;
+              border-radius: 8px;
+              background: #ff6200;
+              color: #fff;
+              border: none;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- FABs at bottom right, car to the left of message -->
+      <div class="fab-btns-bottom-right" id="fabBtnsBottomRight">
+        <button
+          id="contactDriverBtn"
+          class="contact-driver-fab"
+          title="Contact Driver Scenarios"
+        >
+          🚗
+        </button>
+        <button id="smsCstBtn" class="sms-cst-fab" title="SMS to send to CST">
+          💬
+        </button>
+      </div>
+    </div>
+
+    <button
+      id="toggleTimeCalcBtn"
+      class="floating-time-calc-btn"
+      title="Show/Hide Time Calculator"
+    >
+      🕒
+    </button>
+    <button
+      id="toggleFailedTrialsBtn"
+      class="floating-failed-trials-btn"
+      title="Show/Hide Failed Trials"
+    >
+      ⚠️
+    </button>
+    <button
+      id="toggleRefundSlaBtn"
+      class="floating-refund-sla-btn"
+      title="Show/Hide Refund SLA"
+    >
+      🧾
+    </button>
+
   </div>
 
   <div id="c3" class="container">
@@ -2388,6 +2687,999 @@
   </div>
 
   <script>
+const activeOrders = {};
+      let formResetTimer = null;
+      let thirdReminderTimer = null;
+      let timeLeftInterval = null;
+      let timeCalcReminderTimer = null;
+      let timeCalcResetTimer = null;
+      let timeCalcServiceMessageTimer = null;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("chatStart")
+          .addEventListener("keypress", handleEnterKey);
+        document
+          .getElementById("orderPlacing")
+          .addEventListener("keypress", handleEnterKey);
+        document
+          .getElementById("orderDelivery")
+          .addEventListener("keypress", handleEnterKey);
+        document
+          .getElementById("orderIdInput")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") startCountdown();
+          });
+        document
+          .getElementById("endTimeInput")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") calculateNewTime();
+          });
+        updateCalculateButtonState();
+        adjustTimeCalcReminderPosition();
+        adjustTimeCalcServiceMessagePosition();
+        //adjustRefundSlaPanelPosition();
+      });
+
+      function handleEnterKey(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const chatInput = document.getElementById("chatStart");
+          const orderInput = document.getElementById("orderPlacing");
+          const deliveryInput = document.getElementById("orderDelivery");
+          const chatValue = chatInput.value.trim();
+          const orderValue = orderInput.value.trim();
+          const deliveryValue = parseFloat(deliveryInput.value);
+          const serviceSelected = document.querySelector(
+            'input[name="compGroup"]:checked'
+          );
+
+          chatInput.classList.remove("invalid");
+          orderInput.classList.remove("invalid");
+          deliveryInput.classList.remove("invalid");
+
+          let isValid = true;
+
+          if (!chatValue) {
+            chatInput.classList.add("invalid");
+            isValid = false;
+          }
+          if (!orderValue) {
+            orderInput.classList.add("invalid");
+            isValid = false;
+          }
+          if (isNaN(deliveryValue) || deliveryValue <= 0) {
+            deliveryInput.classList.add("invalid");
+            isValid = false;
+          }
+          if (!serviceSelected) {
+            const serviceMsg = document.getElementById("serviceRequiredMsg");
+            serviceMsg.style.fontWeight = "bold";
+            setTimeout(() => {
+              serviceMsg.style.fontWeight = "normal";
+            }, 1000);
+            isValid = false;
+          }
+
+          if (isValid) {
+            calculateDelay();
+          }
+        }
+      }
+
+      function updateCalculateButtonState() {
+        const serviceSelected = document.querySelector(
+          'input[name="compGroup"]:checked'
+        );
+        const orderTypeDiv = document.getElementById("fvNfvSelection");
+        const orderTypeRequired =
+          orderTypeDiv && orderTypeDiv.style.display !== "none";
+        const orderTypeSelected = document.querySelector(
+          'input[name="orderType"]:checked'
+        );
+        const calculateBtn = document.getElementById("calculateBtn");
+        let enable = false;
+        if (serviceSelected) {
+          if (
+            serviceSelected.value === "tmp" ||
+            serviceSelected.value === "tgo"
+          ) {
+            enable = !!orderTypeSelected;
+          } else {
+            enable = true;
+          }
+        }
+        calculateBtn.disabled = !enable;
+        calculateBtn.style.display = enable ? "block" : "none";
+        document.getElementById("serviceRequiredMsg").style.display =
+          serviceSelected ? "none" : "block";
+        if (!serviceSelected) {
+          document
+            .getElementById("timeCalcServiceMessage")
+            .classList.remove("show");
+        }
+      }
+
+      function parseChatTime(input) {
+        try {
+          const [datePart, timePart] = input.split(", ");
+          const [day, month, year] = datePart.split(".");
+          return new Date(`${year}-${month}-${day} ${timePart}`);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function parseOrderTime(input) {
+        try {
+          if (input.includes(",")) {
+            const [datePart, timePart] = input.split(", ");
+            const [day, month, year] = datePart.split(".");
+            return new Date(`${year}-${month}-${day} ${timePart}`);
+          }
+          return new Date(input);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function copyTextToClipboard(text, elementId) {
+        navigator.clipboard.writeText(text).then(
+          () => {
+            const element = document.getElementById(elementId);
+            const originalText = element.innerText;
+            element.innerText = originalText + " ✓ Copied!";
+            setTimeout(() => {
+              element.innerText = originalText;
+            }, 2000);
+          },
+          () => {
+            alert("Failed to copy text. Please try again.");
+          }
+        );
+      }
+
+      function copyCompensationText() {
+        const text =
+          "كاعتذار مننا سوف نقوم بإضافة مبلغ كقسيمة على محفظة القسائم تقدر تستخدمها مع الطلبات الكاش والاونلاين عن طريق التطبيق";
+        copyTextToClipboard(text, "copyCompensationBtn");
+      }
+
+      function cleanupTimers() {
+        if (formResetTimer) {
+          clearTimeout(formResetTimer);
+          formResetTimer = null;
+        }
+        if (thirdReminderTimer) {
+          clearTimeout(thirdReminderTimer);
+          thirdReminderTimer = null;
+        }
+        if (timeLeftInterval) {
+          clearInterval(timeLeftInterval);
+          timeLeftInterval = null;
+        }
+        if (timeCalcReminderTimer) {
+          clearTimeout(timeCalcReminderTimer);
+          timeCalcReminderTimer = null;
+          document.getElementById("timeCalcReminder").classList.remove("show");
+        }
+        if (timeCalcResetTimer) {
+          clearTimeout(timeCalcResetTimer);
+          timeCalcResetTimer = null;
+          document.getElementById("timeCalcResetCountdown").innerText = "";
+        }
+        if (timeCalcServiceMessageTimer) {
+          clearTimeout(timeCalcServiceMessageTimer);
+          timeCalcServiceMessageTimer = null;
+          document
+            .getElementById("timeCalcServiceMessage")
+            .classList.remove("show");
+        }
+      }
+
+      function resetFormFields(timeout = 300000) {
+        cleanupTimers();
+
+        let remainingTime = timeout / 1000;
+        const container = document.querySelector(".container");
+
+        const countdownElement =
+          document.getElementById("resetCountdown") ||
+          document.createElement("div");
+        countdownElement.id = "resetCountdown";
+        countdownElement.innerText = `Form will reset in ${remainingTime} seconds`;
+        container.appendChild(countdownElement);
+
+        if (timeout === 0) {
+          remainingTime = 0;
+          countdownElement.remove();
+        } else {
+          const countdownInterval = setInterval(() => {
+            remainingTime--;
+            countdownElement.innerText = `Form will reset in ${remainingTime} seconds`;
+            if (remainingTime <= 0) clearInterval(countdownInterval);
+          }, 1000);
+        }
+
+        formResetTimer = setTimeout(() => {
+          document.getElementById("chatStart").value = "";
+          document.getElementById("orderPlacing").value = "";
+          document.getElementById("orderDelivery").value = "";
+          document
+            .querySelectorAll('input[name="compGroup"]')
+            .forEach((checkbox) => {
+              checkbox.checked = false;
+            });
+          updateCalculateButtonState();
+          document.getElementById("result").style.opacity = "0";
+          document.getElementById("result").classList.remove("show");
+          document.getElementById("compensation").classList.remove("show");
+          document.getElementById("rightReminder").classList.remove("show");
+          document.getElementById("thirdReminder").classList.remove("show");
+          document.getElementById("failedTrials").classList.add("show");
+          document.getElementById("refundSlaPanel").classList.add("show");
+          document.getElementById("copyCompensationBtn").style.display = "none";
+          countdownElement.remove();
+        }, timeout);
+      }
+
+      function startThirdReminder(minutesToCompensation, serviceType) {
+        const thirdReminderPanel = document.getElementById("thirdReminder");
+        const timeLeftSpan = document.getElementById("timeLeft");
+
+        if (thirdReminderTimer) {
+          clearTimeout(thirdReminderTimer);
+          thirdReminderTimer = null;
+        }
+        if (timeLeftInterval) {
+          clearInterval(timeLeftInterval);
+          timeLeftInterval = null;
+        }
+
+        // Only show if within 15 minutes of compensation threshold
+        if (minutesToCompensation <= 0 || minutesToCompensation > 15) {
+          thirdReminderPanel.classList.remove("show");
+          return;
+        }
+
+        thirdReminderPanel.classList.add("show");
+        let remainingSeconds = minutesToCompensation * 60;
+        timeLeftSpan.innerText = `${Math.floor(remainingSeconds / 60)
+          .toString()
+          .padStart(2, "0")}:${(remainingSeconds % 60)
+          .toString()
+          .padStart(2, "0")}`;
+
+        timeLeftInterval = setInterval(() => {
+          remainingSeconds--;
+          if (remainingSeconds <= 0) {
+            clearInterval(timeLeftInterval);
+            timeLeftSpan.innerText = "00:00";
+            thirdReminderPanel.classList.remove("show");
+            // Show compensation panel when time runs out
+            const compPanel = document.getElementById("compensation");
+            const copyCompBtn = document.getElementById("copyCompensationBtn");
+            document.querySelector(
+              "#compensation h3"
+            ).innerHTML = `⚠ ${serviceType} Required Compensation`;
+            compPanel.classList.add("show");
+            copyCompBtn.style.display = "block";
+            return;
+          }
+          timeLeftSpan.innerText = `${Math.floor(remainingSeconds / 60)
+            .toString()
+            .padStart(2, "0")}:${(remainingSeconds % 60)
+            .toString()
+            .padStart(2, "0")}`;
+        }, 1000);
+      }
+
+      function parseTimeString(timeStr) {
+        const regex = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+        const match = timeStr.match(regex);
+        if (!match) return null;
+
+        let hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const period = match[3].toUpperCase();
+
+        if (hours < 1 || hours > 12 || minutes > 59) return null;
+
+        if (period === "PM" && hours !== 12) hours += 12;
+        if (period === "AM" && hours === 12) hours = 0;
+
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+      }
+
+      function formatTime(date) {
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const period = hours >= 12 ? "PM" : "AM";
+
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes.toString().padStart(2, "0")}${period}`;
+      }
+
+      function adjustTimeCalcReminderPosition() {
+        const timeCalculator = document.getElementById("timeCalculator");
+        const timeCalcReminder = document.getElementById("timeCalcReminder");
+        const rect = timeCalculator.getBoundingClientRect();
+        const newTop = rect.top + rect.height + 20;
+        timeCalcReminder.style.top = `${newTop}px`;
+      }
+
+      function adjustTimeCalcServiceMessagePosition() {
+        const timeCalcReminder = document.getElementById("timeCalcReminder");
+        const timeCalcServiceMessage = document.getElementById(
+          "timeCalcServiceMessage"
+        );
+        const rect = timeCalcReminder.getBoundingClientRect();
+        const newTop = rect.top + rect.height + 10;
+        timeCalcServiceMessage.style.top = `${newTop}px`;
+      }
+
+      function adjustRefundSlaPanelPosition() {
+        const failedTrials = document.getElementById("failedTrials");
+        const refundSlaPanel = document.getElementById("refundSlaPanel");
+        const rect = failedTrials.getBoundingClientRect();
+        const newTop = rect.top + rect.height + 20;
+        refundSlaPanel.style.top = `${newTop}px`;
+      }
+
+      function showRefundSlaDetails() {
+        const selection = document.getElementById("paymentMethodSelect").value;
+        const refundSlaDetails = document.getElementById("refundSlaDetails");
+        const compensationScript =
+          document.getElementById("compensationScript");
+
+        refundSlaDetails.classList.remove("show");
+
+        if (!selection) {
+          return;
+        }
+
+        const slaData = {
+          CreditCardKNet: "5-7",
+          CreditCardEgypt: "2-7",
+          Qpay: "7-21",
+          Benefit: "5-7",
+          ApplePay: "3",
+          CreditCardOman: "5-7",
+        };
+
+        const slaDays = slaData[selection];
+        //console.log("selection", selection);
+        let scriptText = "";
+        if (selection == "CreditCardOman") {
+          scriptText =
+            "هل تريد مني أن أعيد مبلغ طلبك إلى رصيد طلبات الخاص بك على الفور، فهو رصيد في حسابك على طلبات يمكنك استخدامه للطلب من أي مطعم يقبل الدفع الالكتروني  أو أم أن يتم رده على الحساب البنكي في خلال SLA يوم عمل؟";
+        } else {
+          scriptText =
+            "هل تريد مني أن أعيد مبلغ طلبك إلى رصيد طلبات الخاص بك على الفور، فهو رصيد في حسابك على طلبات يمكنك استخدامه للطلب من أي مطعم يقبل الدفع الالكتروني وتنتهي صلاحيته بعد 12 شهر أو أم أن يتم رده على الحساب البنكي في خلال SLA يوم عمل؟";
+        }
+
+        scriptText = scriptText.replace("SLA", slaDays);
+        compensationScript.innerText = scriptText;
+        refundSlaDetails.classList.add("show");
+
+        copyTextToClipboard(scriptText, "compensationScript");
+      }
+
+      function showTimeCalcReminder() {
+        const timeCalcReminder = document.getElementById("timeCalcReminder");
+        if (timeCalcReminderTimer) {
+          clearTimeout(timeCalcReminderTimer);
+          timeCalcReminder.classList.remove("show");
+        }
+
+        timeCalcReminder.classList.add("show");
+        timeCalcReminderTimer = setTimeout(() => {
+          timeCalcReminder.classList.remove("show");
+          timeCalcReminderTimer = null;
+        }, 10000);
+      }
+
+      function showTimeCalcServiceMessage() {
+        const selectedType = document.querySelector(
+          'input[name="compGroup"]:checked'
+        )?.value;
+        const serviceMessageContent = document.getElementById(
+          "serviceMessageContent"
+        );
+        const timeCalcServiceMessage = document.getElementById(
+          "timeCalcServiceMessage"
+        );
+
+        if (!selectedType) {
+          timeCalcServiceMessage.classList.remove("show");
+          return;
+        }
+
+        if (selectedType === "tgo") {
+          serviceMessageContent.innerHTML =
+            '<span class="highlight" style="font-weight:bold;">(Rider RNA)</span> If order picked up send to CST end time +10 min';
+          timeCalcServiceMessage.classList.add("show");
+        } else {
+          timeCalcServiceMessage.classList.remove("show");
+        }
+      }
+
+      function resetTimeCalculator() {
+        if (timeCalcResetTimer) {
+          clearTimeout(timeCalcResetTimer);
+          timeCalcResetTimer = null;
+        }
+        if (timeCalcReminderTimer) {
+          clearTimeout(timeCalcReminderTimer);
+          timeCalcReminderTimer = null;
+          document.getElementById("timeCalcReminder").classList.remove("show");
+        }
+
+        const countdownElement = document.getElementById(
+          "timeCalcResetCountdown"
+        );
+        let remainingTime = 60;
+
+        countdownElement.innerText = `Calculator will reset in ${remainingTime} seconds`;
+
+        const countdownInterval = setInterval(() => {
+          remainingTime--;
+          countdownElement.innerText = `Calculator will reset in ${remainingTime} seconds`;
+          if (remainingTime <= 0) {
+            clearInterval(countdownInterval);
+          }
+        }, 1000);
+
+        timeCalcResetTimer = setTimeout(() => {
+          document.getElementById("endTimeInput").value = "";
+          document.getElementById("timeCalcResult").innerText = "";
+          countdownElement.innerText = "";
+        }, 60000);
+      }
+
+      function calculateNewTime() {
+        const endTimeInput = document.getElementById("endTimeInput");
+        const timeCalcResult = document.getElementById("timeCalcResult");
+        const timeCalcBtn = document.getElementById("timeCalcBtn");
+        const timeStr = endTimeInput.value.trim();
+
+        endTimeInput.classList.remove("invalid");
+
+        const parsedTime = parseTimeString(timeStr);
+        if (!parsedTime) {
+          endTimeInput.classList.add("invalid");
+          timeCalcResult.innerText = "Invalid time format. Use Ex, 10:25 AM";
+          return;
+        }
+
+        parsedTime.setMinutes(parsedTime.getMinutes() + 10);
+        const newTime = formatTime(parsedTime);
+        timeCalcResult.innerText = `New Time: ${newTime}`;
+
+        const copyText = `${timeStr} - ${newTime}`;
+        navigator.clipboard.writeText(copyText).then(
+          () => {
+            const originalText = timeCalcBtn.textContent;
+            timeCalcBtn.textContent = "Copied!";
+            setTimeout(() => {
+              timeCalcBtn.textContent = originalText;
+            }, 2000);
+          },
+          () => {
+            alert("Failed to copy time. Please try again.");
+          }
+        );
+
+        resetTimeCalculator();
+        showTimeCalcReminder();
+      }
+
+      function calculateDelay() {
+        resetFormFields(300000);
+
+        const chatInput = document.getElementById("chatStart").value.trim();
+        const orderInput = document.getElementById("orderPlacing").value.trim();
+        const deliveryMins = parseFloat(
+          document.getElementById("orderDelivery").value
+        );
+        const resultDiv = document.getElementById("result");
+        const compPanel = document.getElementById("compensation");
+        const rightReminderPanel = document.getElementById("rightReminder");
+        const thirdReminderPanel = document.getElementById("thirdReminder");
+        const failedTrialsPanel = document.getElementById("failedTrials");
+        const refundSlaPanel = document.getElementById("refundSlaPanel");
+        const copyCompBtn = document.getElementById("copyCompensationBtn");
+        const selectedType = document.querySelector(
+          'input[name="compGroup"]:checked'
+        )?.value;
+        const selectedOrderType = document.querySelector(
+          'input[name="orderType"]:checked'
+        )?.value;
+
+        if (
+          !chatInput ||
+          !orderInput ||
+          isNaN(deliveryMins) ||
+          deliveryMins <= 0
+        ) {
+          resultDiv.innerHTML =
+            "⚠ Invalid Input: Ensure all fields are filled and delivery time is positive";
+          resultDiv.style.backgroundColor = "#ff3333";
+          resultDiv.style.opacity = "1";
+          resultDiv.classList.add("show");
+          failedTrialsPanel.classList.remove("show");
+          refundSlaPanel.classList.remove("show");
+          return;
+        }
+
+        if (
+          (selectedType === "tmp" || selectedType === "tgo") &&
+          !selectedOrderType
+        ) {
+          resultDiv.innerHTML = "⚠ Please select FV & tMart or NFV order type.";
+          resultDiv.style.backgroundColor = "#ff3333";
+          resultDiv.style.opacity = "1";
+          resultDiv.classList.add("show");
+          failedTrialsPanel.classList.remove("show");
+          refundSlaPanel.classList.remove("show");
+          return;
+        }
+
+        const chatTime = parseChatTime(chatInput);
+        const orderTime = parseOrderTime(orderInput);
+
+        if (
+          !chatTime ||
+          !orderTime ||
+          isNaN(chatTime.getTime()) ||
+          isNaN(orderTime.getTime())
+        ) {
+          resultDiv.innerHTML = "⚠ Invalid Date Format";
+          resultDiv.style.backgroundColor = "#ff3333";
+          resultDiv.style.opacity = "1";
+          resultDiv.classList.add("show");
+          failedTrialsPanel.classList.remove("show");
+          refundSlaPanel.classList.remove("show");
+          return;
+        }
+
+        const actualDeliveryTime = new Date(
+          orderTime.getTime() + deliveryMins * 60 * 1000
+        );
+        const delay = (chatTime - actualDeliveryTime) / (1000 * 60);
+
+        let status = "",
+          color = "";
+        let showCompensation = false,
+          compensationText = "",
+          minutesToCompensation = 0;
+
+        // If no delay (delay < 0), show green status and nothing else
+        if (delay < 0) {
+          status = "✔ On Time: No delay";
+          color = "#00cc00";
+          resultDiv.innerHTML = status;
+          resultDiv.style.backgroundColor = color;
+          resultDiv.style.opacity = "1";
+          resultDiv.classList.add("show");
+          compPanel.classList.remove("show");
+          copyCompBtn.style.display = "none";
+          thirdReminderPanel.classList.remove("show");
+          rightReminderPanel.classList.remove("show");
+          failedTrialsPanel.classList.remove("show");
+          refundSlaPanel.classList.remove("show");
+          return;
+        }
+
+        // New delay logic for all service types
+        let delayMsg = "";
+        if (delay >= 0 && delay <= 10) {
+          delayMsg = "Complaint about short delay";
+          color = "#ffd700";
+        } else if (delay <= 20) {
+          delayMsg = "Complaint about moderate delay";
+          color = "#ffb300";
+        } else if (delay <= 30) {
+          delayMsg = "Complaint about severe delay";
+          color = "#ff8c00";
+        } else {
+          delayMsg = "Complaint about extreme delay";
+          color = "#b30000";
+        }
+
+        // Compensation logic (unchanged)
+        if (selectedType === "tmp") {
+          if (selectedOrderType === "fv") {
+            showCompensation = delay >= 10;
+            compensationText = "TMP FV/tMart Required Compensation (>10 mins)";
+          } else if (selectedOrderType === "nfv") {
+            showCompensation = delay >= 15;
+            compensationText = "TMP NFV Required Compensation (>15 mins)";
+          }
+          status = `${delayMsg}: ${delay.toFixed(2)} mins delay`;
+        } else if (selectedType === "tgo") {
+          if (selectedOrderType === "fv") {
+            if (delay >= 10) {
+              showCompensation = true;
+              compensationText = `TGO & Tmart Required Compensation (≥10 mins)`;
+            }
+          } else if (selectedOrderType === "nfv") {
+            if (delay >= 15) {
+              showCompensation = true;
+              compensationText = `TGO & Tmart Required Compensation (≥15 mins)`;
+            }
+          }
+
+          status = `${delayMsg}: ${delay.toFixed(2)} mins delay`;
+        } else {
+          status = `${delayMsg}: ${delay.toFixed(2)} mins delay`;
+        }
+
+        resultDiv.innerHTML = status;
+        resultDiv.style.backgroundColor = color;
+        resultDiv.style.opacity = "1";
+        resultDiv.classList.add("show");
+
+        failedTrialsPanel.classList.remove("show");
+        refundSlaPanel.classList.remove("show");
+
+        if (showCompensation) {
+          document.querySelector(
+            "#compensation h3"
+          ).innerHTML = `⚠ ${compensationText}`;
+          compPanel.classList.add("show");
+          copyCompBtn.style.display = "block";
+          showCompReasonAnimatedPopup(delay, selectedType);
+        } else {
+          compPanel.classList.remove("show");
+          copyCompBtn.style.display = "none";
+          compReasonPopup.classList.remove("show");
+        }
+
+        // Trigger third reminder for tgo (≥3 mins and <10 mins before compensation)
+        if (
+          selectedType === "tmp" ||
+          selectedType === "tgo"
+        ) {
+          let threshold = selectedOrderType === "fv" ? 10 : 15;
+          minutesToCompensation = Math.max(0, threshold - delay);
+          if (
+            minutesToCompensation <= 7 &&
+            !showCompensation &&
+            minutesToCompensation > 0
+          ) {
+            startThirdReminder(
+              minutesToCompensation,
+              selectedType.toUpperCase()
+            );
+          } else {
+            thirdReminderPanel.classList.remove("show");
+          }
+        } else {
+          thirdReminderPanel.classList.remove("show");
+        }
+
+        if (selectedType === "tmp") {
+          rightReminderPanel.classList.remove("show");
+        } else {
+          rightReminderPanel.classList.remove("show");
+        }
+      }
+
+      document
+        .querySelectorAll('input[name="compGroup"]')
+        .forEach((checkbox) => {
+          checkbox.addEventListener("change", function () {
+            if (this.checked) {
+              document
+                .querySelectorAll('input[name="compGroup"]')
+                .forEach((cb) => {
+                  if (cb !== this) cb.checked = false;
+                });
+            }
+            updateCalculateButtonState();
+            showTimeCalcServiceMessage();
+            // Show FV/NFV selection only for TMP or TGO
+            const fvNfvDiv = document.getElementById("fvNfvSelection");
+            if (
+              this.value === "tmp" ||
+              this.value === "tgo"
+            ) {
+              fvNfvDiv.style.display = "block";
+            } else {
+              fvNfvDiv.style.display = "none";
+              document
+                .querySelectorAll('input[name="orderType"]')
+                .forEach((r) => (r.checked = false));
+            }
+          });
+        });
+
+      // Add event listeners for order type radio buttons to update button state
+      document
+        .querySelectorAll('.order-type-selection input[type="radio"]')
+        .forEach(function (radio) {
+          radio.addEventListener("change", function () {
+            updateCalculateButtonState();
+          });
+        });
+
+      function startCountdown() {
+        const orderId = document.getElementById("orderIdInput").value.trim();
+        if (!orderId) {
+          alert("Please enter an Order ID.");
+          return;
+        }
+
+        if (activeOrders[orderId]) {
+          alert("This Order ID is already being tracked.");
+          return;
+        }
+
+        const timerContainer = document.getElementById("orderTimers");
+        const timerItem = document.createElement("div");
+        timerItem.className = "order-timer-item";
+        timerItem.id = `timer-${orderId}`;
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "order-timer-checkbox";
+        checkbox.id = `checkbox-${orderId}`;
+        checkbox.addEventListener("change", function () {
+          if (this.checked) {
+            timerItem.classList.add("completed");
+          } else {
+            timerItem.classList.remove("completed");
+          }
+        });
+
+        const timerContent = document.createElement("div");
+        timerContent.className = "order-timer-content";
+        timerContent.innerHTML = `Order ${orderId}: <span class="timer-display">10:00</span>`;
+
+        const progressBar = document.createElement("div");
+        progressBar.className = "timer-progress";
+        const progressBarFill = document.createElement("div");
+        progressBarFill.className = "timer-progress-bar";
+        progressBarFill.style.width = "100%";
+        progressBar.appendChild(progressBarFill);
+        timerContent.appendChild(progressBar);
+
+        const timerControls = document.createElement("div");
+        timerControls.className = "timer-controls";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-timer";
+        deleteBtn.innerHTML = "❌";
+        deleteBtn.title = "Delete timer";
+        deleteBtn.addEventListener("click", function () {
+          if (activeOrders[orderId]) {
+            delete activeOrders[orderId];
+            timerContainer.removeChild(timerItem);
+          }
+        });
+
+        timerControls.appendChild(deleteBtn);
+        timerItem.appendChild(checkbox);
+        timerItem.appendChild(timerContent);
+        timerItem.appendChild(timerControls);
+        timerContainer.appendChild(timerItem);
+
+        activeOrders[orderId] = 600;
+        const timerDisplay = timerContent.querySelector(".timer-display");
+        const totalSeconds = 600;
+
+        const interval = setInterval(() => {
+          if (!activeOrders[orderId]) {
+            clearInterval(interval);
+            return;
+          }
+
+          if (activeOrders[orderId] <= 0) {
+            clearInterval(interval);
+            timerDisplay.innerHTML = "Time's up!";
+            timerDisplay.style.color = "red";
+            timerDisplay.style.fontWeight = "bold";
+            progressBarFill.style.width = "0%";
+          } else {
+            activeOrders[orderId]--;
+            const mins = Math.floor(activeOrders[orderId] / 60)
+              .toString()
+              .padStart(2, "0");
+            const secs = (activeOrders[orderId] % 60)
+              .toString()
+              .padStart(2, "0");
+            timerDisplay.innerHTML = `${mins}:${secs}`;
+            progressBarFill.style.width = `${
+              (activeOrders[orderId] / totalSeconds) * 100
+            }%`;
+          }
+        }, 1000);
+
+        document.getElementById("orderIdInput").value = "";
+      }
+
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      darkModeToggle.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+        if (document.body.classList.contains("dark-mode")) {
+          darkModeToggle.innerHTML = "☀️";
+        } else {
+          darkModeToggle.innerHTML = "🌙";
+        }
+      });
+
+      // Compensation Reason Animated Popup logic
+      const compReasonPopup = document.getElementById(
+        "compReasonAnimatedPopup"
+      );
+      const compReasonPopupText = document.getElementById(
+        "compReasonPopupText"
+      );
+      const closeCompReasonPopup = document.getElementById(
+        "closeCompReasonPopup"
+      );
+      closeCompReasonPopup.addEventListener("click", () => {
+        compReasonPopup.classList.remove("show");
+      });
+
+      function showCompReasonAnimatedPopup(delay, selectedType) {
+        let reason = "";
+        let complaint = "";
+        // Show for all types if delay > 0
+        if (delay <= 0) {
+          compReasonPopup.classList.remove("show");
+          return;
+        }
+        if (selectedType == "tmp") {
+          if (delay > 0 && delay <= 20) {
+            reason = "Restaurant Late Order - TMP";
+            complaint = "Complaint about moderate delay";
+          } else if (delay > 20 && delay <= 29) {
+            reason = "Restaurant Late Order - TMP";
+            complaint = "Complaint about severe delay";
+          } else if (delay >= 30) {
+            reason = "Restaurant Late Order - TMP";
+            complaint = "Complaint about extreme delay";
+          }
+        } else {
+          if (delay > 0 && delay <= 20) {
+            reason = "Moderate Delay";
+            complaint = "Complaint about moderate delay";
+          } else if (delay >= 21 && delay <= 30) {
+            reason = "Severe Delay";
+            complaint = "Complaint about severe delay";
+          } else if (delay > 30) {
+            reason = "Extreme Delay";
+            complaint = "Complaint about extreme delay";
+          }
+        }
+
+        if (reason) {
+          compReasonPopupText.textContent = reason;
+          compReasonPopup.classList.add("show");
+        }
+      }
+
+      // Contact Driver Popup logic
+      const contactDriverBtn = document.getElementById("contactDriverBtn");
+      const contactDriverPopup = document.getElementById("contactDriverPopup");
+      const closeContactDriverPopup = document.getElementById(
+        "closeContactDriverPopup"
+      );
+      contactDriverBtn.addEventListener("click", () => {
+        contactDriverPopup.classList.add("show");
+      });
+      closeContactDriverPopup.addEventListener("click", () => {
+        contactDriverPopup.classList.remove("show");
+      });
+
+      // SMS CST Popup logic
+      const smsCstBtn = document.getElementById("smsCstBtn");
+      const smsCstPopup = document.getElementById("smsCstPopup");
+      const closeSmsCstPopup = document.getElementById("closeSmsCstPopup");
+      smsCstBtn.addEventListener("click", () => {
+        smsCstPopup.classList.add("show");
+      });
+      closeSmsCstPopup.addEventListener("click", () => {
+        smsCstPopup.classList.remove("show");
+      });
+
+      // Show/hide FABs based on service selection
+      function updateFabBtnsVisibility() {
+        const serviceSelected = document.querySelector(
+          'input[name="compGroup"]:checked'
+        );
+        const fabBtns = document.getElementById("fabBtnsBottomRight");
+        if (serviceSelected) {
+          fabBtns.classList.add("show");
+        } else {
+          fabBtns.classList.remove("show");
+        }
+      }
+      document
+        .querySelectorAll('input[name="compGroup"]')
+        .forEach((checkbox) => {
+          checkbox.addEventListener("change", updateFabBtnsVisibility);
+        });
+      updateFabBtnsVisibility();
+
+      // Floating button to toggle time calculator
+      const toggleTimeCalcBtn = document.getElementById("toggleTimeCalcBtn");
+      const timeCalculator = document.getElementById("timeCalculator");
+      let timeCalcVisible = true;
+      function updateTimeCalcBtnLabel() {
+        if (timeCalculator.style.display === "none") {
+          toggleTimeCalcBtn.title = "Show Time Calculator";
+          toggleTimeCalcBtn.innerHTML = "🕒";
+        } else {
+          toggleTimeCalcBtn.title = "Hide Time Calculator";
+          toggleTimeCalcBtn.innerHTML = "🕒";
+        }
+      }
+      toggleTimeCalcBtn.addEventListener("click", function () {
+        if (timeCalculator.style.display === "none") {
+          timeCalculator.style.display = "";
+        } else {
+          timeCalculator.style.display = "none";
+        }
+        updateTimeCalcBtnLabel();
+      });
+      // Initialize label
+      updateTimeCalcBtnLabel();
+
+      // Floating button to toggle failedTrials
+      const toggleFailedTrialsBtn = document.getElementById(
+        "toggleFailedTrialsBtn"
+      );
+      const failedTrials = document.getElementById("failedTrials");
+      function updateFailedTrialsBtnLabel() {
+        if (failedTrials.style.display === "none") {
+          toggleFailedTrialsBtn.title = "Show Failed Trials";
+          toggleFailedTrialsBtn.innerHTML = "⚠️";
+        } else {
+          toggleFailedTrialsBtn.title = "Hide Failed Trials";
+          toggleFailedTrialsBtn.innerHTML = "⚠️";
+        }
+      }
+      toggleFailedTrialsBtn.addEventListener("click", function () {
+        if (failedTrials.style.display === "none") {
+          failedTrials.style.display = "";
+        } else {
+          failedTrials.style.display = "none";
+        }
+        updateFailedTrialsBtnLabel();
+      });
+      // Initialize label
+      updateFailedTrialsBtnLabel();
+
+      // Floating button to toggle refundSlaPanel
+      const toggleRefundSlaBtn = document.getElementById("toggleRefundSlaBtn");
+      const refundSlaPanel = document.getElementById("refundSlaPanel");
+      function updateRefundSlaBtnLabel() {
+        if (refundSlaPanel.style.display === "none") {
+          toggleRefundSlaBtn.title = "Show Refund SLA";
+          toggleRefundSlaBtn.innerHTML = "🧾";
+        } else {
+          toggleRefundSlaBtn.title = "Hide Refund SLA";
+          toggleRefundSlaBtn.innerHTML = "🧾";
+        }
+      }
+      toggleRefundSlaBtn.addEventListener("click", function () {
+        if (refundSlaPanel.style.display === "none") {
+          refundSlaPanel.style.display = "";
+        } else {
+          refundSlaPanel.style.display = "none";
+        }
+        updateRefundSlaBtnLabel();
+      });
+      // Initialize label
+      updateRefundSlaBtnLabel();
+
+
     function showContainer(id) {
       // إخفاء الكونتينر الأساسي
       document.getElementById("mainContainer").classList.remove("active");
