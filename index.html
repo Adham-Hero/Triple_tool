@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Style Containers</title>
+      <!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+<!-- FontAwesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -63,22 +67,984 @@
     <button onclick="addContainer(3)">زر 3</button>
   </div>
 
-  <!-- الكونتينرات -->
+  <!-- tool 1 -->
   <div id="container-1" class="tool-container">
-    <h2>كونتينر 1</h2>
-    <p>هذا خاص بالزر 1</p>
+    <div class="main-container">
+        <button
+          id="darkModeToggle"
+          class="dark-mode-toggle"
+          title="Toggle dark mode"
+        >
+          🌙
+        </button>
+        <div class="container">
+          <div class="header">
+            <h2>Talabat Delay Calculator</h2>
+            <button class="reset-form-btn" onclick="resetFormFields(0)">
+              Reset
+            </button>
+          </div>
+  
+          <label for="chatStart">Chat Start Time:</label>
+          <input type="text" id="chatStart" placeholder="21.01.2025, 05:10 PM" />
+  
+          <label for="orderPlacing">Order Placing Time:</label>
+          <input
+            type="text"
+            id="orderPlacing"
+            placeholder="Apr 19, 2025 05:18 PM or 21.01.2025, 04:50 PM"
+          />
+  
+          <label for="orderDelivery">Delivery Time (in minutes):</label>
+          <input type="number" id="orderDelivery" placeholder="75" />
+  
+          <div class="service-selection">
+            <div class="service-option">
+              <input type="checkbox" id="tmp" name="compGroup" value="tmp" />
+              <label for="tmp">TMP</label>
+            </div>
+            <div class="service-option">
+              <input type="checkbox" id="tgo" name="compGroup" value="tgo" />
+              <label for="tgo">TGO & Tmart</label>
+            </div>
+          </div>
+          <div id="fvNfvSelection" style="display: none; margin-bottom: 15px">
+            <label style="font-weight: 600">Order Type:</label>
+            <div class="order-type-selection">
+              <input type="radio" id="fv" name="orderType" value="fv" />
+              <label for="fv" class="order-type-option">FV & tMart</label>
+              <input type="radio" id="nfv" name="orderType" value="nfv" />
+              <label for="nfv" class="order-type-option">NFV</label>
+            </div>
+          </div>
+          <div class="required-message" id="serviceRequiredMsg">
+            * Please select a service type
+          </div>
+  
+          <button
+            id="calculateBtn"
+            onclick="calculateDelay()"
+            disabled
+            style="display: none"
+          >
+            Check Order Status
+          </button>
+          <div id="result"></div>
+  
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd" />
+  
+          <label for="orderIdInput">Order ID to Follow:</label>
+          <input type="text" id="orderIdInput" placeholder="Enter Order ID" />
+          <button onclick="startCountdown()">Start 10-min Countdown</button>
+          <div id="orderTimers"></div>
+        </div>
+  
+        <div id="compensation">
+          <h3>⚠ Required Compensation</h3>
+          <ul>
+            <li>Marked As Delieverd Order >=10</li>
+          </ul>
+          <button id="copyCompensationBtn" onclick="copyCompensationText()">
+            Compensation Script 📋
+          </button>
+        </div>
+  
+        <div id="failedTrials" class="failed-trials show">
+          <h3>📵 Failed Trials</h3>
+          <ul>
+            <li>All Circutes are busy</li>
+            <li>Silent Call</li>
+            <li>
+              Error Message (Wrong/Incomplete number) - use the backup prefix
+            </li>
+            <li>Beep once tone - use the backup prefix</li>
+            <li>Call dropped</li>
+          </ul>
+        </div>
+  
+        <div id="thirdReminder" class="third-reminder">
+          <div class="emoji">🚨</div>
+          <h3>FINAL WARNING!</h3>
+          <p><strong>Requires Compensation</strong></p>
+          <p>Time Left: <span id="timeLeft">15:00</span></p>
+          <p>If delayed during chat till Closure</p>
+        </div>
+  
+        <div id="rightReminder" class="right-reminder">
+          <div class="emoji">📞</div>
+          <h3 id="callAction">Call Action</h3>
+          <div class="paper" id="callMessage"></div>
+        </div>
+  
+        <div id="timeCalculator" class="time-calculator">
+          <h3>Add 10 Minutes</h3>
+          <label for="endTimeInput">End Time (Ex, 10:25 AM):</label>
+          <input type="text" id="endTimeInput" placeholder="10:25 AM" />
+          <button id="timeCalcBtn" onclick="calculateNewTime()">Calculate</button>
+          <div id="timeCalcResult"></div>
+          <div id="timeCalcResetCountdown"></div>
+        </div>
+  
+        <div id="timeCalcReminder" class="time-calc-reminder">
+          <p>Add it on HeroCare - inform CST</p>
+        </div>
+  
+        <div id="timeCalcServiceMessage" class="time-calc-service-message">
+          <p id="serviceMessageContent"></p>
+        </div>
+  
+        <div id="refundSlaPanel" class="refund-sla-panel show">
+          <h3>Refund SLA</h3>
+          <select id="paymentMethodSelect" onchange="showRefundSlaDetails()">
+            <option value="" disabled selected>Select Payment Method</option>
+            <option value="CreditCardKNet">
+              Credit Card/K-Net (All Countries except Egypt and Oman)
+            </option>
+            <option value="CreditCardEgypt">Credit Card (Egypt)</option>
+            <option value="Qpay">Qpay (Qatar)</option>
+            <option value="Benefit">Benefit (Bahrain)</option>
+            <option value="ApplePay">Apple Pay (All Countries)</option>
+            <option value="CreditCardOman">Credit Card (Oman)</option>
+          </select>
+          <div id="refundSlaDetails" class="refund-sla-details">
+            <p id="compensationScript"></p>
+          </div>
+        </div>
+  
+        <div class="marquee">
+          <div class="marquee-text">
+            🚨 If the delay on RST Contact Driver Should be (restaurant hasn't
+            started preparing the food) Check Late Owner 🚨 Refresh the Hurrier
+            every now and then 🚨 If the amount more than (180AED) in UAE (No
+            Refund/No partial refund/No compensation) send the case to EXPO 🚨
+            Contact drivers - Customer asks about refund: Refund query, Refund
+            action taken by you: Refund request 🚨Online Payment Issues -- First
+            contact from customer: Online Payment Issue 🚨| Customer contacted
+            before SLA: Follow up on existing case 🚨| Case needs to go to R&V
+            team: Online Payment Issue 🚨| Case already with R&V team: Follow up
+            on existing case 🚨| Customer unaware of incomplete order: Online
+            Payment Issue 🚨| Voucher Issues: Customer aware order was incomplete:
+            Voucher already used 🚨| Customer not eligible: Voucher already used
+            🚨| Customer didn't receive voucher: Voucher not received 🚨
+          </div>
+        </div>
+  
+        <div id="compReasonAnimatedPopup" class="comp-reason-animated-popup">
+          <div class="comp-reason-popup-content">
+            <h3>Compensation Reason</h3>
+            <div id="compReasonPopupText"></div>
+            <div
+              id="compReasonPopupContact"
+              style="margin-top: 16px; font-size: 1.1em; color: #444"
+            ></div>
+            <button
+              id="closeCompReasonPopup"
+              title="Close"
+              style="
+                margin-top: 12px;
+                padding: 6px 18px;
+                border-radius: 8px;
+                background: #ff6200;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+              "
+            >
+              Close
+            </button>
+          </div>
+        </div>
+  
+        <div id="contactDriverPopup" class="contact-driver-popup">
+          <div class="contact-driver-popup-content">
+            <h3>Contact Driver Scenarios</h3>
+            <div style="margin-bottom: 18px; text-align: left">
+              <b>ETA is stuck or increasing (TGO):</b>
+              <div style="font-size: 0.98em; margin-bottom: 10px">
+                The customer gets in touch as the time to wait to be delivered is
+                stuck or increasing.<br />Restaurant informed us that the delivery
+                time will be increased
+              </div>
+              <b
+                >Order will not be processed (Cancellation action was already
+                taken from Restaurant / Talabat / Customers):</b
+              >
+              <div style="font-size: 0.98em">
+                The customer wants to check the order status and the vendor cannot
+                proceed with the order - Order Declined / Cancelled by the
+                Restaurant or by Talabat<br />Order Cancelled by Sheild and the
+                customer wasn't aware that the order was already cancelled<br />Customer
+                Cancelled his order from his end and wants to confirm that the
+                order is cancelled (Not asking about refunds)
+              </div>
+            </div>
+            <button
+              id="closeContactDriverPopup"
+              style="
+                margin-top: 12px;
+                padding: 6px 18px;
+                border-radius: 8px;
+                background: #ff6200;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+              "
+            >
+              Close
+            </button>
+          </div>
+        </div>
+  
+        <div id="smsCstPopup" class="sms-cst-popup">
+          <div class="sms-cst-popup-content">
+            <h3>SMS to send to CST in case unreachable</h3>
+            <div style="margin-bottom: 18px; text-align: left">
+              <b>Delay in order delivery:</b>
+              <div style="font-size: 0.98em; margin-bottom: 10px">
+                The restaurant informed us that the order will be delayed.
+              </div>
+              <b>The order is being prepared:</b>
+              <div style="font-size: 0.98em; margin-bottom: 10px">
+                The restaurant informed us that they are preparing the order at
+                the moment.
+              </div>
+              <b>The order is on the way:</b>
+              <div style="font-size: 0.98em">
+                The restaurant informed us that the order is being delivered.
+              </div>
+            </div>
+            <button
+              id="closeSmsCstPopup"
+              style="
+                margin-top: 12px;
+                padding: 6px 18px;
+                border-radius: 8px;
+                background: #ff6200;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+              "
+            >
+              Close
+            </button>
+          </div>
+        </div>
+  
+        <!-- FABs at bottom right, car to the left of message -->
+        <div class="fab-btns-bottom-right" id="fabBtnsBottomRight">
+          <button
+            id="contactDriverBtn"
+            class="contact-driver-fab"
+            title="Contact Driver Scenarios"
+          >
+            🚗
+          </button>
+          <button id="smsCstBtn" class="sms-cst-fab" title="SMS to send to CST">
+            💬
+          </button>
+        </div>
+      </div>
+  
+      <button
+        id="toggleTimeCalcBtn"
+        class="floating-time-calc-btn"
+        title="Show/Hide Time Calculator"
+      >
+        🕒
+      </button>
+      <button
+        id="toggleFailedTrialsBtn"
+        class="floating-failed-trials-btn"
+        title="Show/Hide Failed Trials"
+      >
+        ⚠️
+      </button>
+      <button
+        id="toggleRefundSlaBtn"
+        class="floating-refund-sla-btn"
+        title="Show/Hide Refund SLA"
+      >
+        🧾
+      </button>
+  
     <button id="reset-btn-1" class="reset-btn" onclick="resetPage()">الرجوع</button>
   </div>
 
+  <!-- tool 2 -->
   <div id="container-2" class="tool-container">
-    <h2>كونتينر 2</h2>
-    <p>هذا خاص بالزر 2</p>
+    <!-- <div class="container"> -->
+        <div class="app-header">
+            <h1 class="app-title">Late Owner <span>Cancellation</span> Calculator</h1>
+            <p class="slogan">Late? Relax. We Know Who's Guilty</p>
+            <button id="dark-mode-toggle" title="Toggle dark mode"><i class="fas fa-moon"></i> <span>Dark Mode</span></button>
+        </div>
+        <div class="instructions">
+            <div class="instruction-header">
+                <i class="fas fa-lightbulb instruction-icon"></i>
+                <h3 class="instruction-title">How to Use This Tool <i class="fas fa-circle-info" style="font-size:1.1rem;cursor:pointer;" id="help-modal-btn" title="More help"></i></h3>
+            </div>
+            <ol>
+                <li>Paste your main timeline data into the first text area below.</li>
+                <li>Paste your additional timeline data (Ordered at, Send to restaurant) into the second text area.</li>
+                <li>Select the rider status, enter the delivery time, and select the order type below the text areas.</li>
+                <li>Click <b>Generate Timeline</b> to view both timelines, total dispatching time, and total waiting time at the restaurant, etc.</li>
+            </ol>
+            <div class="instruction-note">
+                <i class="fas fa-info-circle note-icon"></i>
+                <p>This tool detects delivery milestones, calculates dispatching time, and determines delay reasons based on dispatching, rider availability, partner preparation, or reassignment to another rider.</p>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Input Your Data</h2>
+            </div>
+            <div class="input-area" style="align-items: flex-start;">
+                <div id="delay-summary" style="min-width:220px;max-width:260px;margin-right:18px;background:#fff;border-radius:14px;box-shadow:var(--card-shadow);padding:22px 18px 18px 18px;display:flex;flex-direction:column;gap:16px;">
+                    <h3 style="font-size:1.1rem;font-weight:700;color:var(--primary-dark);margin-bottom:10px;">Delay Reasons</h3>
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        <li>
+                            <i class="fas fa-clock" style="color:var(--primary);margin-right:8px;"></i>
+                            Long Dispatching <span class="delay-value" id="long-dispatching-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-motorcycle" style="color:#8e44ad;margin-right:8px;"></i>
+                            Rider is late to Pick Up <span class="delay-value" id="rider-late-pickup-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-utensils" style="color:#e67e22;margin-right:8px;"></i>
+                            Late preparation from the restaurant <span class="delay-value" id="late-prep-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt" style="color:#e74c3c;margin-right:8px;"></i>
+                            Rider is late to Drop Off (late delivery) <span class="delay-value" id="late-dropoff-value"></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-box" style="color:#27ae60;margin-right:8px;"></i>
+                            Order picked up/another rider <span class="delay-value" id="order-picked-up-value"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="input-container">
+                    <label for="input-data">Main Timeline Data <i class="fas fa-circle-info" title="Paste the main timeline (e.g. 11:34 PM **Queued**) here."></i></label>
+                    <div class="utility-buttons">
+                        <button id="example-main-btn" title="Insert example main timeline"><i class="fas fa-magic"></i> Example</button>
+                        <button id="clear-main-btn" title="Clear main timeline"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+                    <textarea id="input-data" placeholder="Paste your main timeline data here (11:34 PM **Queued**)" autocomplete="off"></textarea>
+                </div>
+                <div class="input-container">
+                    <label for="additional-input-data">Additional Timeline Data <i class="fas fa-circle-info" title="Paste additional timeline (e.g. Ordered at, Send to restaurant) here."></i></label>
+                    <div class="utility-buttons">
+                        <button id="example-additional-btn" title="Insert example additional timeline"><i class="fas fa-magic"></i> Example</button>
+                        <button id="clear-additional-btn" title="Clear additional timeline"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+                    <textarea id="additional-input-data" placeholder="Paste your additional timeline data here (Ordered at\n13:44 PM)" autocomplete="off"></textarea>
+                </div>
+            </div>
+            <div class="button-group" id="rider-status-group">
+                <button class="status-button" data-status="reachable" title="Rider is reachable">Rider Reachable</button>
+                <button class="status-button" data-status="unreachable" title="Rider is unreachable">Rider Unreachable</button>
+            </div>
+            <div class="input-group">
+                <label for="current-time-input">Current Time <i class="fas fa-circle-info" title="Enter current time in format: 24.07.2025, 08:49 AM"></i></label>
+                <input type="text" id="current-time-input" class="delivery-time-input" placeholder="24.07.2025, 08:49 AM" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="est-dropoff-input">Estimated Dropoff Departure <i class="fas fa-circle-info" title="Enter estimated dropoff departure time (e.g. 01:56 PM)"></i></label>
+                <input type="text" id="est-dropoff-input" class="delivery-time-input" placeholder="01:56 PM" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="delivery-time-input">Delivery Time (minutes) <i class="fas fa-circle-info" title="Enter the total delivery time in minutes."></i></label>
+                <input type="number" id="delivery-time-input" class="delivery-time-input" placeholder="15" min="1" max="300" step="1">
+            </div>
+            <div class="button-group" style="margin-bottom:0; margin-top: 0;">
+                <button id="unprofessional-btn" class="status-button" style="background:#e74c3c;color:#fff;"><i class="fas fa-user-slash"></i> Order Marked As Delivered</button>
+            </div>
+            <div class="button-group" id="order-type-group">
+                <button class="status-button" data-type="normal" title="Normal order">Normal Order</button>
+                <button class="status-button" data-type="nfv" title="NFV order">NFV</button>
+            </div>
+            <div class="button-group" style="margin-bottom:0;">
+                <button id="parse-button" title="Generate timeline"><i class="fas fa-bolt"></i> Generate Timeline</button>
+                <button id="reset-btn" title="Reset all fields" style="background:#bbb;color:#fff;"><i class="fas fa-rotate-left"></i> Reset</button>
+            </div>
+        </div>
+        <div id="timeline-tab">
+            <div id="result-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Main Event Timeline</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="result-table">
+                            <thead>
+                                <tr>
+                                    <th width="30%">Time</th>
+                                    <th width="70%">Event</th>
+                                </tr>
+                            </thead>
+                            <tbody id="result-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="summary-card" id="dispatch-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Dispatch Time <i class="fas fa-circle-info summary-info" title="Time from Queued to Dispatched."></i></div>
+                            <div class="summary-value" id="dispatch-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="waiting-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Restaurant Waiting Time <i class="fas fa-circle-info summary-info" title="Time the rider waited at the restaurant."></i></div>
+                            <div class="summary-value" id="waiting-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="delivery-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Delivery Time <i class="fas fa-circle-info summary-info" title="Total delivery time (input)."></i></div>
+                            <div class="summary-value" id="delivery-time">--</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card" id="rider-delay-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Rider Delay <i class="fas fa-circle-info summary-info" title="Rider arrived before committed pickup time."></i></div>
+                            <div class="summary-value" id="rider-delay">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="pick-updated-variance-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Pick Updated Time Variance <i class="fas fa-circle-info summary-info" title="Difference between committed and updated pickup times."></i></div>
+                            <div class="summary-value" id="pick-updated-variance">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="rider-delay-dropoff-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Rider Delay to Dropoff <i class="fas fa-circle-info summary-info" title="Delay past the Near Dropoff time, compared to current time."></i></div>
+                            <div class="summary-value" id="rider-delay-dropoff">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="scheduled-time-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Scheduled Time <i class="fas fa-circle-info summary-info" title="Time from Scheduled to first Queued event."></i></div>
+                            <div class="summary-value" id="scheduled-time">--</div>
+                        </div>
+                    </div>
+                    <div class="summary-card" id="delay-rider-redispatched-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-title">Delay rider - redispatched <i class="fas fa-circle-info summary-info" title="Difference from Est. pickup arrival that appears in the Accepted event to the time for the Near Pick up event, Queued event in case of redispatched."></i></div>
+                            <div class="summary-value" id="delay-rider-redispatched">--</div>
+                        </div>
+                    </div>
+
+            </div>
+            <div id="additional-timeline-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Additional Timeline</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="additional-timeline-table">
+                            <thead>
+                                <tr>
+                                    <th width="70%">Event</th>
+                                    <th width="30%">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="additional-timeline-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="fab-btn" id="fab-generate" title="Generate Timeline"><i class="fas fa-bolt"></i><span>Generate</span></button>
+        <div class="footer">
+            © 2025 Betto | Delivery Timeline Tool v2.1 | <a href="#" id="help-modal-btn-footer" style="color:var(--primary);text-decoration:underline;">Help</a>
+        </div>
+    </div>
+    <div class="spinner-overlay" id="spinner-overlay">
+        <i class="fas fa-spinner spinner"></i>
+    </div>
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="help-modal-close">×</span>
+            <h2><i class="fas fa-circle-info"></i> Help & FAQ</h2>
+            <ul>
+                <li><b>What is this tool?</b> <br>It helps you analyze delivery event timelines and identify delays or issues.</li>
+                <li><b>How do I use it?</b> <br>Paste your main and additional timeline data, select options, and click Generate Timeline.</li>
+                <li><b>What formats are supported?</b> <br>Times like <code>11:34 PM **Queued**</code> or table format. Additional timeline: <code>Ordered at 13:44 PM</code>.</li>
+                <li><b>What do the summary cards mean?</b> <br>Hover the <i class="fas fa-circle-info"></i> icons for explanations.</li>
+                <li><b>How do I copy or download results?</b> <br>Use the Copy or Download buttons below the results.</li>
+                <li><b>Need more help?</b> <br>Contact: <a href="mailto:betto@example.com">betto@example.com</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="rider-pickup-analysis" style="position:fixed;top:120px;right:32px;z-index:1200;width:270px;background:#fff;border-radius:12px;box-shadow:0 4px 18px rgba(255,90,0,0.10);padding:18px 16px 16px 16px;display:none;">
+        <h3 style="font-size:1.08rem;font-weight:700;color:var(--primary-dark);margin-bottom:10px;">Rider Pickup Analysis</h3>
+        <table style="width:100%;font-size:0.98rem;">
+            <tr>
+                <td>Arrived <b>Before</b> Committed</td>
+                <td id="before-committed-time">--</td>
+            </tr>
+            <tr>
+                <td>Arrived <b>After</b> Committed</td>
+                <td id="after-committed-time">--</td>
+            </tr>
+        </table>
+    </div>
     <button id="reset-btn-2" class="reset-btn" onclick="resetPage()">الرجوع</button>
   </div>
-
+  
+  <!-- tool 3 -->
   <div id="container-3" class="tool-container">
-    <h2>كونتينر 3</h2>
-    <p>هذا خاص بالزر 3</p>
+    <div class="header">
+        <div class="header-content">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFUSURBVDjLrZM/SAJxGIZdWwuDlnCplkAEm1zkaIiGFFpyMIwGK5KGoK2lphDKkMDg3LLUSIJsSKhIi+684CokOtTiMizCGuzEU5K3vOEgKvtBDe/2Pc8H3x8NAM1fQf8I0J4HXl0puJxFuF1FjAzl0N9L6BNBZ/rzQfObftoM7dkwglA7Rd2RwGq1Qq/XD0RVBMlz6HS6gFqBwEA6T2A0GmEymWA2m2GxW2Gx22GxWKBpml+3QJRF0WOPxwOv1wufzwdRFDE2NgZBEKDr+kA+n4csy5AkCYlEAqlUCtPT0wgGgwgEAshms1BVFdFoFJIkIZlMQlEUZLNZLCwsYGlpCdvb29jZ2cHu7i4URYGu6xgMBjBNE67rYrPZYLvd4nA44Hg84nQ64Xw+43K54Hq94na74X6/4/F44Pl84vV64f1+4/P54Pv+By6QZZkZj8ffAFl5Y+Kd6f1iAAAAAElFTkSuQmCC" alt="Teleperformance Logo" class="logo">
+            <div class="header-text">
+                <h1>CS Documentation Helper</h1>
+                <p>each interaction matters</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="editor-section">
+            <h2>Comment Editor</h2>
+            <div class="section-title">Documentation: <span class="shortcut-hint">(Try shortcuts like !refund or !delivery)</span></div>
+            <textarea id="documentationInput" placeholder="Enter your documentation here..."></textarea>
+            <div class="autocomplete-suggestions" id="autocompleteList"></div>
+            
+            <div class="button-group">
+                <button id="generateBtn" class="action-btn">Generate Preview</button>
+                <button id="copyBtn" class="action-btn">Copy Full Comment</button>
+            </div>
+            <div class="button-group">
+                <button id="saveTemplateBtn" class="action-btn">Save as Template</button>
+                <button id="resetBtn" class="action-btn">Reset</button>
+            </div>
+            
+            <div class="preview-section" id="previewSection">
+                <h3>Preview:</h3>
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+            
+            <div class="templates-section">
+                <h3>Smart Templates</h3>
+                <div id="templatesList">
+                    <div class="template-item" data-template="Complaint">Customer complained about [issue]. Apologized and offered [solution]. Case marked as [status]. <button class="delete-template" title="Delete template">×</button></div>
+                    <div class="template-item" data-template="Refund">Processed [partial/full] refund of [amount] due to [reason]. Customer [satisfied/not satisfied]. <button class="delete-template" title="Delete template">×</button></div>
+                    <div class="template-item" data-template="Delivery">Order #12345 delayed by [time]. Contacted rider (RNA). Updated customer with new ETA: [time]. <button class="delete-template" title="Delete template">×</button></div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h3>History & Search</h3>
+                <input type="text" id="historySearch" placeholder="Search history...">
+                <div id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sidebar-handle" id="sidebarHandle">◀</div>
+    
+    <div class="quick-actions" id="quickActions">
+        <div class="quick-actions-header">
+            <input type="text" id="quickActionsSearch" placeholder="Search quick actions...">
+            <button id="addQuickActionBtn">+ Add Quick Action</button>
+        </div>
+        
+        <div class="section-group" data-section="Customer Flag">
+            <div class="section-title" draggable="true">Customer Flag: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn flag-red" data-text="Red Flag" data-tooltip="Red Flag - High priority issue" draggable="true">Red Flag</button>
+                <button class="action-btn flag-orange" data-text="Orange Flag" data-tooltip="Orange Flag - Medium priority issue" draggable="true">Orange Flag</button>
+                <button class="action-btn flag-green" data-text="Green Flag" data-tooltip="Green Flag - Low priority issue" draggable="true">Green Flag</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Customer Type">
+            <div class="section-title" draggable="true">Customer Type: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Default customer" data-tooltip="Default customer" draggable="true">Default customer</button>
+                <button class="action-btn" data-text="TPRO CST" data-tooltip="TPRO Customer (TPRO CST)" draggable="true">TPRO CST</button>
+                <button class="action-btn" data-text="VIP CST" data-tooltip="VIP Customer (VIP CST)" draggable="true">VIP CST</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Customer Inquiries">
+            <div class="section-title" draggable="true">Customer Inquiries: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Complained about" data-tooltip="Complained about" draggable="true">Complained about</button>
+                <button class="action-btn" data-text="Late Delivery" data-tooltip="Late Delivery" draggable="true">Late Delivery</button>
+                <button class="action-btn" data-text="Wrong order" data-tooltip="Wrong order" draggable="true">Wrong order</button>
+                <button class="action-btn" data-text="Wrong item" data-tooltip="Wrong item" draggable="true">Wrong item</button>
+                <button class="action-btn" data-text="Missing item" data-tooltip="Missing item" draggable="true">Missing item</button>
+                <button class="action-btn" data-text="Expired" data-tooltip="Expired" draggable="true">Expired</button>
+                <button class="action-btn" data-text="Nearly Expired" data-tooltip="Nearly Expired" draggable="true">Nearly Expired</button>
+                <button class="action-btn" data-text="Foreign object" data-tooltip="Foreign object" draggable="true">Foreign object</button>
+                <button class="action-btn" data-text="Cooking instruction not followed" data-tooltip="Cooking instruction not followed" draggable="true">Cooking instruction not followed</button>
+                <button class="action-btn" data-text="Poor packaging" data-tooltip="Poor packaging" draggable="true">Poor packaging</button>
+                <button class="action-btn" data-text="Extra Amount Charged" data-tooltip="Extra Amount Charged" draggable="true">Extra Amount Charged</button>
+                <button class="action-btn" data-text="Money collection issue" data-tooltip="Money collection issue" draggable="true">Money collection issue</button>
+                <button class="action-btn" data-text="Order not delivered" data-tooltip="Order not delivered" draggable="true">Order not delivered</button>
+                <button class="action-btn" data-text="Order marked as delivered but didn't receive" data-tooltip="Order marked as delivered but didn't receive" draggable="true">Order marked as delivered but didn't receive</button>
+                <button class="action-btn" data-text="Order not assigned to a rider" data-tooltip="Order not assigned to a rider" draggable="true">Order not assigned to a rider</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Response Status">
+            <div class="section-title" draggable="true">Response Status: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Answered" data-tooltip="Answered (ANS)" draggable="true">Answered</button>
+                <button class="action-btn" data-text="Not Answered" data-tooltip="Not Answered" draggable="true">Not Answered</button>
+                <button class="action-btn" data-text="FU" data-tooltip="Follow Up (FU)" draggable="true">FU</button>
+                <button class="action-btn" data-text="WFA" data-tooltip="Waiting for Answer (WFA)" draggable="true">WFA</button>
+                <button class="action-btn" data-text="BRB" data-tooltip="Be Right Back (BRB)" draggable="true">BRB</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Contacts">
+            <div class="section-title" draggable="true">Contacts: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Called RST" data-tooltip="Called Restaurant (RST)" draggable="true">Called RST</button>
+                <button class="action-btn" data-text="Called CST" data-tooltip="Called Customer (CST)" draggable="true">Called CST</button>
+                <button class="action-btn" data-text="CNA" data-tooltip="Customer Not Answering (CNA)" draggable="true">CNA</button>
+                <button class="action-btn" data-text="Called ROP" data-tooltip="Called Restaurant Operator (ROP)" draggable="true">Called ROP</button>
+                <button class="action-btn" data-text="Called Ven" data-tooltip="Called Vendor (Ven)" draggable="true">Called Ven</button>
+                <button class="action-btn" data-text="Called Rider" data-tooltip="Called Rider" draggable="true">Called Rider</button>
+                <button class="action-btn" data-text="RNA" data-tooltip="Restaurant/Rider Not Answering (RNA)" draggable="true">RNA</button>
+                <button class="action-btn" data-text="RM" data-tooltip="Rider Manager (RM)" draggable="true">RM</button>
+                <button class="action-btn" data-text="AM" data-tooltip="Account Manager (AM)" draggable="true">AM</button>
+                <button class="action-btn" data-text="MCB" data-tooltip="Manager Call Back (MCB)" draggable="true">MCB</button>
+                <button class="action-btn" data-text="Left note on Hurrier" data-tooltip="Left note on Hurrier" draggable="true">Left note on Hurrier</button>
+                <button class="action-btn" data-text="Advice CST with Tracking Feature" data-tooltip="Advice CST with Tracking Feature" draggable="true">Advice CST with Tracking Feature</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Time/Delivery">
+            <div class="section-title" draggable="true">Time/Delivery: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="WDT" data-tooltip="Within Delivery Time (WDT)" draggable="true">WDT</button>
+                <button class="action-btn" data-text="PDT" data-tooltip="Promise Delivery Time (PDT)" draggable="true">PDT</button>
+                <button class="action-btn" data-text="DT" data-tooltip="Delivery Time (DT)" draggable="true">DT</button>
+                <button class="action-btn" data-text="ETA" data-tooltip="Estimated Time Arrival (ETA)" draggable="true">ETA</button>
+                <button class="action-btn" data-text="ETA from to" data-tooltip="ETA from XX to XX" draggable="true">ETA from to</button>
+                <button class="action-btn" data-text="OTW" data-tooltip="On The Way (OTW)" draggable="true">OTW</button>
+                <button class="action-btn" data-text="ASAP" data-tooltip="As Soon As Possible (ASAP)" draggable="true">ASAP</button>
+                <button class="action-btn" data-text="Under Prep" data-tooltip="Under Preparation (Under Prep)" draggable="true">Under Prep</button>
+                <button class="action-btn" data-text="Min" data-tooltip="Minute(s) (Min)" draggable="true">Min</button>
+                <button class="action-btn" data-text="Mins" data-tooltip="Minutes (Mins)" draggable="true">Mins</button>
+                <button class="action-btn" data-text="H" data-tooltip="Hour(s) (H)" draggable="true">H</button>
+                <button class="action-btn" data-text="Hrs" data-tooltip="Hours (Hrs)" draggable="true">Hrs</button>
+                <button class="action-btn" data-text="End Time +10 minutes" data-tooltip="End Time +10 minutes" draggable="true">End Time +10 minutes</button>
+                <button class="action-btn" data-text="Order more than 50% from the delivery time" data-tooltip="Order more than 50% from the delivery time" draggable="true">Order more than 50% from the delivery time</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Actions">
+            <div class="section-title" draggable="true">Actions: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Info" data-tooltip="Informed (Info)" draggable="true">Info</button>
+                <button class="action-btn" data-text="TC" data-tooltip="Talabat Credit (TC)" draggable="true">TC</button>
+                <button class="action-btn" data-text="R&V" data-tooltip="Refund & Validation (R&V)" draggable="true">R&V</button>
+                <button class="action-btn" data-text="Not Eligible for PR" data-tooltip="Not Eligible for Partial Refund (Not Eligible for PR)" draggable="true">Not Eligible for PR</button>
+                <button class="action-btn" data-text="OT" data-tooltip="Offline Ticket (OT)" draggable="true">OT</button>
+                <button class="action-btn" data-text="SLA" data-tooltip="Service Level Agreement (SLA)" draggable="true">SLA</button>
+                <button class="action-btn" data-text="PR" data-tooltip="Partial Refund (PR)" draggable="true">PR</button>
+                <button class="action-btn" data-text="FR" data-tooltip="Full Refund (FR)" draggable="true">FR</button>
+                <button class="action-btn" data-text="App" data-tooltip="Application (App)" draggable="true">App</button>
+                <button class="action-btn" data-text="Fill FORM" data-tooltip="Fill FORM" draggable="true">Fill FORM</button>
+                <button class="action-btn" data-text="Advice CST to wait" data-tooltip="Advice CST to wait" draggable="true">Advice CST to wait</button>
+                <button class="action-btn" data-text="Advice CST to place a new order" data-tooltip="Advice CST to place a new order" draggable="true">Advice CST to place a new order</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Compensation">
+            <div class="section-title" draggable="true">Compensation: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Can not comp" data-tooltip="Cannot compensate" draggable="true">Can not comp</button>
+                <button class="action-btn" data-text="Fraud detected" data-tooltip="Fraud detected" draggable="true">Fraud detected</button>
+                <button class="action-btn" data-text="Budget limit" data-tooltip="Budget limit" draggable="true">Budget limit</button>
+                <button class="action-btn" data-text="Apply Comp" data-tooltip="Apply Compensation" draggable="true">Apply Comp</button>
+                <button class="action-btn" data-text="Comp before" data-tooltip="Compensated before" draggable="true">Comp before</button>
+                <button class="action-btn" data-text="Comp 0 amount" data-tooltip="Compensation 0 amount" draggable="true">Comp 0 amount</button>
+                <button class="action-btn" data-text="Exceeded 3 times capping" data-tooltip="Exceeded 3 times capping" draggable="true">Exceeded 3 times capping</button>
+                <button class="action-btn" data-text="CST eligible for partial refund" data-tooltip="CST eligible for partial refund" draggable="true">CST eligible for partial refund</button>
+                <button class="action-btn" data-text="Less than threshold" data-tooltip="Less than threshold" draggable="true">Less than threshold</button>
+                <button class="action-btn" data-text="More than threshold" data-tooltip="More than threshold" draggable="true">More than threshold</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Documentation">
+            <div class="section-title" draggable="true">Documentation: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="PIC" data-tooltip="Picture (PIC)" draggable="true">PIC</button>
+                <button class="action-btn" data-text="SS" data-tooltip="Screenshot (SS)" draggable="true">SS</button>
+                <button class="action-btn" data-text="T&C" data-tooltip="Terms & Conditions (T&C)" draggable="true">T&C</button>
+                <button class="action-btn" data-text="Msg" data-tooltip="Message (Msg)" draggable="true">Msg</button>
+                <button class="action-btn" data-text="SMS" data-tooltip="Short Message Service (SMS)" draggable="true">SMS</button>
+                <button class="action-btn" data-text="Num" data-tooltip="Number (Num)" draggable="true">Num</button>
+                <button class="action-btn" data-text="Acc" data-tooltip="Account (Acc)" draggable="true">Acc</button>
+                <button class="action-btn" data-text="No PIN Code" data-tooltip="No PIN Code" draggable="true">No PIN Code</button>
+                <button class="action-btn" data-text="No Dispatche notes" data-tooltip="No Dispatche notes" draggable="true">No Dispatche notes</button>
+                <button class="action-btn" data-text="CST share correct address" data-tooltip="CST share correct address" draggable="true">CST share correct address</button>
+                <button class="action-btn" data-text="Rider not moving" data-tooltip="Rider not moving" draggable="true">Rider not moving</button>
+                <button class="action-btn" data-text="Completed for less than 20 min" data-tooltip="Completed for less than 20 min" draggable="true">Completed for less than 20 min</button>
+                <button class="action-btn" data-text="Completed for more than 20 min" data-tooltip="Completed for more than 20 min" draggable="true">Completed for more than 20 min</button>
+                <button class="action-btn" data-text="CST insist to cancel" data-tooltip="CST insist to cancel" draggable="true">CST insist to cancel</button>
+                <button class="action-btn" data-text="CST good history" data-tooltip="CST good history" draggable="true">CST good history</button>
+                <button class="action-btn" data-text="Package was sealed" data-tooltip="Package was sealed" draggable="true">Package was sealed</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Personnel/Other">
+            <div class="section-title" draggable="true">Personnel/Other: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="SPV" data-tooltip="Supervisor (SPV)" draggable="true">SPV</button>
+                <button class="action-btn" data-text="TL" data-tooltip="Team Leader (TL)" draggable="true">TL</button>
+                <button class="action-btn" data-text="SME" data-tooltip="Subject Matter Expert (SME)" draggable="true">SME</button>
+                <button class="action-btn" data-text="VP" data-tooltip="Vendor Portal (VP)" draggable="true">VP</button>
+                <button class="action-btn" data-text="Dr" data-tooltip="Doctor (Dr)" draggable="true">Dr</button>
+                <button class="action-btn" data-text="HC" data-tooltip="Hero Care (HC)" draggable="true">HC</button>
+                <button class="action-btn" data-text="T2" data-tooltip="Tier 2 (T2)" draggable="true">T2</button>
+                <button class="action-btn" data-text="T3" data-tooltip="Tier 3 (T3)" draggable="true">T3</button>
+                <button class="action-btn" data-text="BOA" data-tooltip="Backoffice (BOA)" draggable="true">BOA</button>
+                <button class="action-btn" data-text="CBH" data-tooltip="Customer Bad History (CBH)" draggable="true">CBH</button>
+                <button class="action-btn" data-text="CGH" data-tooltip="Customer Good History (CGH)" draggable="true">CGH</button>
+                <button class="action-btn" data-text="BL" data-tooltip="Backlog (BL)" draggable="true">BL</button>
+                <button class="action-btn" data-text="Rider status (Accepted)" data-tooltip="Rider status (Accepted)" draggable="true">Rider status (Accepted)</button>
+                <button class="action-btn" data-text="Rider status (Near pickup)" data-tooltip="Rider status (Near pickup)" draggable="true">Rider status (Near pickup)</button>
+                <button class="action-btn" data-text="Rider status (Left pickup/Pickedup)" data-tooltip="Rider status (Left pickup/Pickedup)" draggable="true">Rider status (Left pickup/Pickedup)</button>
+                <button class="action-btn" data-text="Rider status (Neardrop off)" data-tooltip="Rider status (Neardrop off)" draggable="true">Rider status (Neardrop off)</button>
+                <button class="action-btn" data-text="Hurrier status" data-tooltip="Hurrier status" draggable="true">Hurrier status</button>
+                <button class="action-btn" data-text="Order ready waiting for Rider" data-tooltip="Order ready waiting for Rider" draggable="true">Order ready waiting for Rider</button>
+                <button class="action-btn" data-text="Rider said at RST waiting order" data-tooltip="Rider said at RST waiting order" draggable="true">Rider said at RST waiting order</button>
+                <button class="action-btn" data-text="Rider said correct address" data-tooltip="Rider said correct address" draggable="true">Rider said correct address</button>
+                <button class="action-btn" data-text="Rider said wrong address" data-tooltip="Rider said wrong address" draggable="true">Rider said wrong address</button>
+                <button class="action-btn" data-text="Asked him hurry up and call CST" data-tooltip="Asked him hurry up and call CST" draggable="true">Asked him hurry up and call CST</button>
+            </div>
+        </div>
+        
+        <!-- New sections with the requested quick actions -->
+        <div class="section-group" data-section="Order Status Issues">
+            <div class="section-title" draggable="true">Order Status Issues: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="CST follow up on his order" draggable="true">CST follow up</button>
+                <button class="action-btn" data-text="Order WDT (Within Delivery Time)" draggable="true">Order WDT</button>
+                <button class="action-btn" data-text="Order not assigned to a rider" draggable="true">No rider assigned</button>
+                <button class="action-btn" data-text="Order marked as delivered but didn't receive" draggable="true">Marked delivered, not received</button>
+                <button class="action-btn" data-text="Order is late doesn't want to wait" draggable="true">Late, CST won't wait</button>
+                <button class="action-btn" data-text="Order not picked up" draggable="true">Order not picked up</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Cancellation Requests">
+            <div class="section-title" draggable="true">Cancellation Requests: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="CST asked to cancel due to change of mind" draggable="true">Cancel: Change of mind</button>
+                <button class="action-btn" data-text="CST asked to cancel due to late delivery" draggable="true">Cancel: Late delivery</button>
+                <button class="action-btn" data-text="CST asked to cancel due to unavailable item" draggable="true">Cancel: Unavailable item</button>
+                <button class="action-btn" data-text="CST insist on cancellation" draggable="true">CST insists on cancel</button>
+                <button class="action-btn" data-text="Cancel order due to late/owner decision" draggable="true">Cancel: Late/owner decision</button>
+                <button class="action-btn" data-text="Cancel order due to fake order (Shield)" draggable="true">Cancel: Fake order</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Modification Requests">
+            <div class="section-title" draggable="true">Modification Requests: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="CST asked to Modify order" draggable="true">Modify order</button>
+                <button class="action-btn" data-text="CST asked to change address" draggable="true">Change address</button>
+                <button class="action-btn" data-text="Update CST phone number" draggable="true">Update phone number</button>
+                <button class="action-btn" data-text="CST asked to change payment method" draggable="true">Change payment method</button>
+                <button class="action-btn" data-text="Modify items of order" draggable="true">Modify items</button>
+                <button class="action-btn" data-text="Update address on BOA (Backoffice)" draggable="true">BOA address update</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Food Quality Issues">
+            <div class="section-title" draggable="true">Food Quality Issues: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Food Quality/Spilled food (Burnt/Undercooked)" draggable="true">Poor food quality</button>
+                <button class="action-btn" data-text="T mart Bad Quality" draggable="true">T mart quality issue</button>
+                <button class="action-btn" data-text="Food temperature issues" draggable="true">Temperature issue</button>
+                <button class="action-btn" data-text="Cooking instruction not followed" draggable="true">Cooking not followed</button>
+                <button class="action-btn" data-text="Foreign object in food" draggable="true">Foreign object</button>
+                <button class="action-btn" data-text="Expired/Nearly expired items" draggable="true">Expired items</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Order Accuracy Issues">
+            <div class="section-title" draggable="true">Order Accuracy Issues: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Wrong order received" draggable="true">Wrong order</button>
+                <button class="action-btn" data-text="Missing item" draggable="true">Missing item</button>
+                <button class="action-btn" data-text="Wrong item received" draggable="true">Wrong item</button>
+                <button class="action-btn" data-text="Combo Meal Side item missing" draggable="true">Missing combo item</button>
+                <button class="action-btn" data-text="Item replacement process issue" draggable="true">Replacement issue</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Refund & Compensation">
+            <div class="section-title" draggable="true">Refund & Compensation: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Refund request" draggable="true">Refund request</button>
+                <button class="action-btn" data-text="CST eligible for partial refund" draggable="true">Eligible for partial refund</button>
+                <button class="action-btn" data-text="Apply compensation" draggable="true">Apply compensation</button>
+                <button class="action-btn" data-text="CST asked for redelivery" draggable="true">Redelivery request</button>
+                <button class="action-btn" data-text="Refund & Validation (R&V)" draggable="true">R&V</button>
+                <button class="action-btn" data-text="Take action from BOA to 00" draggable="true">BOA action to 00</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Technical & System Issues">
+            <div class="section-title" draggable="true">Technical & System Issues: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Online Payment issue" draggable="true">Payment issue</button>
+                <button class="action-btn" data-text="Payment method issue" draggable="true">Payment method issue</button>
+                <button class="action-btn" data-text="Subscription/premium service issue" draggable="true">Subscription issue</button>
+                <button class="action-btn" data-text="Fill T Mart Form issue" draggable="true">T Mart form issue</button>
+                <button class="action-btn" data-text="Fill Fraud Form" draggable="true">Fraud form</button>
+                <button class="action-btn" data-text="Hurrier status issue" draggable="true">Hurrier issue</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Documentation & Follow-up">
+            <div class="section-title" draggable="true">Documentation & Follow-up: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Follow up on existing case" draggable="true">Follow up case</button>
+                <button class="action-btn" data-text="Cancellation reason inquiry" draggable="true">Cancel reason inquiry</button>
+                <button class="action-btn" data-text="CST informed with cancellation policy" draggable="true">Cancel policy informed</button>
+                <button class="action-btn" data-text="Leave note to Rider on Hurrier" draggable="true">Hurrier note</button>
+                <button class="action-btn" data-text="Update special instructions" draggable="true">Update instructions</button>
+                <button class="action-btn" data-text="Send steps to CST" draggable="true">Send steps to CST</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Verification Processes">
+            <div class="section-title" draggable="true">Verification Processes: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Check Shopper tool" draggable="true">Check Shopper</button>
+                <button class="action-btn" data-text="Verify drop-off location matches PIN" draggable="true">Verify PIN location</button>
+                <button class="action-btn" data-text="Check Rider transcript" draggable="true">Rider transcript</button>
+                <button class="action-btn" data-text="Confirm package was sealed" draggable="true">Confirm sealed package</button>
+                <button class="action-btn" data-text="Verify CST good history" draggable="true">Verify CST history</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Time-Related Expressions">
+            <div class="section-title" draggable="true">Time-Related Expressions: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="Order completed more than 10 min ago" draggable="true">Completed >10 min ago</button>
+                <button class="action-btn" data-text="Order completed less than 10 min ago" draggable="true">Completed <10 min ago</button>
+                <button class="action-btn" data-text="Order more than 50% from delivery time" draggable="true">>50% delivery time</button>
+                <button class="action-btn" data-text="Rider status with End Time +10 minutes" draggable="true">End Time +10 min</button>
+                <button class="action-btn" data-text="Order still preparing" draggable="true">Still preparing</button>
+            </div>
+        </div>
+        
+        <div class="section-group" data-section="Specific Scenarios">
+            <div class="section-title" draggable="true">Specific Scenarios: <span class="section-handle">≡</span></div>
+            <div class="action-buttons">
+                <button class="action-btn" data-text="CST placed two orders" draggable="true">CST placed two orders</button>
+                <button class="action-btn" data-text="Rider stacked with multiple orders" draggable="true">Rider stacked</button>
+                <button class="action-btn" data-text="Utilization less than 75% and out of zone" draggable="true">Utilization <75%, out zone</button>
+                <button class="action-btn" data-text="Fake order detected" draggable="true">Fake order</button>
+                <button class="action-btn" data-text="Different data from BOA" draggable="true">BOA data mismatch</button>
+                <button class="action-btn" data-text="In Progress status" draggable="true">In Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quick Action Modal -->
+    <div id="quickActionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Quick Action</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="quickActionText">Action Text:</label>
+                <input type="text" id="quickActionText" placeholder="Enter the text for this action">
+            </div>
+            <div class="form-group">
+                <label for="quickActionTooltip">Tooltip (optional):</label>
+                <input type="text" id="quickActionTooltip" placeholder="Enter tooltip text">
+            </div>
+            <div class="form-group">
+                <label for="quickActionSection">Section:</label>
+                <select id="quickActionSection">
+                    <option value="Customer Flag">Customer Flag</option>
+                    <option value="Customer Type">Customer Type</option>
+                    <option value="Customer Inquiries">Customer Inquiries</option>
+                    <option value="Response Status">Response Status</option>
+                    <option value="Contacts">Contacts</option>
+                    <option value="Time/Delivery">Time/Delivery</option>
+                    <option value="Actions">Actions</option>
+                    <option value="Compensation">Compensation</option>
+                    <option value="Documentation">Documentation</option>
+                    <option value="Personnel/Other">Personnel/Other</option>
+                    <option value="Order Status Issues">Order Status Issues</option>
+                    <option value="Cancellation Requests">Cancellation Requests</option>
+                    <option value="Modification Requests">Modification Requests</option>
+                    <option value="Food Quality Issues">Food Quality Issues</option>
+                    <option value="Order Accuracy Issues">Order Accuracy Issues</option>
+                    <option value="Refund & Compensation">Refund & Compensation</option>
+                    <option value="Technical & System Issues">Technical & System Issues</option>
+                    <option value="Documentation & Follow-up">Documentation & Follow-up</option>
+                    <option value="Verification Processes">Verification Processes</option>
+                    <option value="Time-Related Expressions">Time-Related Expressions</option>
+                    <option value="Specific Scenarios">Specific Scenarios</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quickActionColor">Color (optional):</label>
+                <select id="quickActionColor">
+                    <option value="">Default</option>
+                    <option value="flag-red">Red</option>
+                    <option value="flag-orange">Orange</option>
+                    <option value="flag-green">Green</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelQuickActionBtn">Cancel</button>
+                <button id="saveQuickActionBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Enhanced by <span>Talabat Quality Team</span> | CS Documentation Helper v1.2
+    </div>
+
     <button id="reset-btn-3" class="reset-btn" onclick="resetPage()">الرجوع</button>
   </div>
 
@@ -1461,1365 +2427,724 @@
         case 2:
                     // For tool #2
         containerStyle = `
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
-        min-height: 100vh;
-        min-width: 100vw;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        overflow-x: hidden;
-      }
-
-      body.dark-mode {
-        background: linear-gradient(135deg, #18191a 0%, #232526 100%);
-        color: #f0f0f0;
-      }
-
-      .main-container {
-        max-width: 98vw;
-        width: 100%;
-        margin: 2vw auto;
-        padding: 30px 20px;
-        background: #f8f8f8;
-        border-radius: 24px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-        position: relative;
-      }
-      body.dark-mode .main-container {
-        background: #18191a;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      }
-
-      .container {
-        max-width: 500px;
-        width: 100%;
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        z-index: 1;
-        margin: 0 auto;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .container {
-        background: #232526;
-        color: #f0f0f0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        color: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      .dark-mode .header {
-        background: linear-gradient(90deg, #ff6200 80%, #232526 100%);
-        color: #fff;
-      }
-
-      h2 {
-        font-size: 24px;
-        text-align: left;
-        margin: 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-      }
-
-      .reset-form-btn {
-        background: linear-gradient(90deg, #ff1a1a, #ff4d4d);
-        width: auto;
-        padding: 8px 20px;
-        font-size: 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: none;
-        color: white;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      }
-
-      .reset-form-btn:hover {
-        background: linear-gradient(90deg, #e60000, #ff3333);
-        transform: translateY(-2px) translateZ(5px);
-        box-shadow: 0 5px 15px rgba(255, 26, 26, 0.4);
-      }
-
-      .dark-mode .reset-form-btn {
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        color: #fff;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-      }
-
-      .dark-mode .reset-form-btn:hover {
-        background: linear-gradient(90deg, #e65600, #ff8c00);
-        color: #fff;
-      }
-
-      label {
-        font-weight: 600;
-        display: block;
-        text-align: left;
-        margin-bottom: 8px;
-        color: #222;
-      }
-
-      .dark-mode label,
-      .dark-mode .required-message {
-        color: #ffd580;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        font-size: 16px;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        background: #f9f9f9;
-      }
-
-      .dark-mode input,
-      .dark-mode select {
-        background: #232526;
-        color: #f0f0f0;
-        border: 2px solid #666;
-      }
-
-      input:focus {
-        border-color: #ff6200;
-        outline: none;
-        box-shadow: 0 0 8px rgba(255, 98, 0, 0.3);
-      }
-
-      .dark-mode input:focus,
-      .dark-mode select:focus {
-        border-color: #ff9a00;
-        box-shadow: 0 0 8px #ff9a00;
-      }
-
-      input.invalid {
-        border-color: #ff1a1a;
-        animation: shake 0.3s ease-in-out;
-      }
-
-      .dark-mode input.invalid {
-        border-color: #ff4d4d;
-      }
-
-      @keyframes shake {
-        0% {
-          transform: translateX(0);
+    <style>
+        :root {
+            --primary: #ff5a00;
+            --primary-dark: #e65100;
+            --secondary: #262626;
+            --light-bg: #f8f8f8;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --timeline-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --dark-bg: #181818;
+            --dark-card: #232323;
+            --dark-text: #f1f1f1;
         }
-        25% {
-          transform: translateX(-5px);
+        html, body {
+            height: 100%;
         }
-        50% {
-          transform: translateX(5px);
+        body {
+            min-height: 100vh;
+            font-family: 'Roboto', 'Montserrat', sans-serif;
+            background: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+            line-height: 1.6;
+            transition: background 0.5s, color 0.5s;
         }
-        75% {
-          transform: translateX(-5px);
+        body.dark-mode {
+            background: linear-gradient(120deg, #232526 0%, #414345 100%);
+            color: var(--dark-text);
         }
-        100% {
-          transform: translateX(0);
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            padding: 0 15px 40px 15px;
         }
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: none;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      button:hover {
-        background: linear-gradient(90deg, #e65600, #ff8c00);
-        transform: translateY(-2px) translateZ(5px);
-        box-shadow: 0 8px 20px rgba(255, 98, 0, 0.4);
-      }
-
-      .dark-mode button,
-      .dark-mode .reset-form-btn {
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        color: #fff;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-      }
-
-      .dark-mode button:hover,
-      .dark-mode .reset-form-btn:hover {
-        background: linear-gradient(90deg, #e65600, #ff8c00);
-        color: #fff;
-      }
-
-      button:disabled {
-        background: #b0b0b0;
-        cursor: not-allowed;
-        opacity: 0.6;
-        transform: none;
-        box-shadow: none;
-      }
-
-      .dark-mode button:disabled {
-        background: #444;
-        color: #aaa;
-      }
-
-      #result {
-        opacity: 0;
-        transition: all 0.5s ease-in-out;
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 12px;
-        text-align: center;
-        font-size: 20px;
-        font-weight: 700;
-        color: white;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        transform: translateZ(10px);
-        position: relative;
-      }
-
-      .dark-mode #result {
-        color: #fff;
-        background: #333;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      }
-
-      #result.show {
-        opacity: 1;
-        transform: translateZ(15px) scale(1.02);
-      }
-
-      #compensation {
-        position: fixed;
-        left: -400px;
-        top: 80px;
-        width: 280px;
-        background: linear-gradient(135deg, #ff3333, #ff6666);
-        color: white;
-        font-size: 16px;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        transition: left 0.5s ease-in-out;
-        z-index: 2;
-        text-align: left;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode #compensation {
-        background: linear-gradient(135deg, #b34700, #ff6200);
-        color: #fff;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-      }
-
-      #compensation.show {
-        left: 20px;
-      }
-
-      #compensation h3 {
-        font-size: 22px;
-        margin-bottom: 15px;
-        text-align: center;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-      }
-
-      #compensation ul {
-        padding-left: 20px;
-        margin: 0;
-      }
-
-      #compensation ul li {
-        margin-bottom: 8px;
-        list-style: square;
-      }
-
-      #copyCompensationBtn {
-        background: linear-gradient(90deg, #ffd700, #ffea00);
-        color: #222;
-        font-size: 16px;
-        font-weight: 600;
-        padding: 10px;
-        margin-top: 15px;
-        border-radius: 10px;
-        cursor: pointer;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        animation: pulse 1.5s infinite;
-        width: 100%;
-        border: none;
-        display: none;
-      }
-
-      .dark-mode #copyCompensationBtn {
-        background: linear-gradient(90deg, #ffd700, #ffea00);
-        color: #222;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1) translateZ(0);
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
         }
-        50% {
-          transform: scale(1.05) translateZ(5px);
+        .app-title {
+            color: var(--secondary);
+            font-size: 2.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
-        100% {
-          transform: scale(1) translateZ(0);
+        .app-title span {
+            color: var(--primary);
         }
-      }
-
-      .right-reminder {
-        position: fixed;
-        top: 100px;
-        right: -400px;
-        width: 280px;
-        background: #fff5e6;
-        color: #222;
-        font-size: 16px;
-        font-weight: 500;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        transition: right 0.5s ease-in-out;
-        text-align: center;
-        z-index: 3;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .right-reminder {
-        background: #232526;
-        color: #ffd580;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-      }
-
-      .right-reminder.show {
-        right: 20px;
-      }
-
-      .right-reminder .emoji {
-        font-size: 50px;
-        margin-bottom: 10px;
-      }
-
-      .right-reminder .paper {
-        background-color: #fff;
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 8px;
-        border: 2px dashed #ff6200;
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .third-reminder {
-        position: fixed;
-        top: 400px;
-        left: -400px;
-        width: 220px;
-        background: linear-gradient(135deg, #ffd700, #ffea00);
-        color: #222;
-        font-size: 14px;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        transition: left 0.5s ease-in-out;
-        z-index: 1000;
-        text-align: center;
-        animation: shake 0.5s ease-in-out infinite;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .third-reminder {
-        background: linear-gradient(135deg, #b34700, #ffd700);
-        color: #232526;
-      }
-
-      .third-reminder.show {
-        left: 20px;
-      }
-
-      .third-reminder .emoji {
-        font-size: 30px;
-        margin-bottom: 5px;
-      }
-
-      .third-reminder h3 {
-        font-size: 16px;
-        margin-bottom: 5px;
-      }
-
-      .third-reminder p {
-        margin: 5px 0;
-      }
-
-      #timeLeft {
-        display: inline-block;
-        font-size: 18px;
-        font-weight: bold;
-        color: #ff3333;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        background-color: #ffffff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        margin: 5px;
-        animation: blink 1s infinite;
-      }
-
-      @keyframes blink {
-        0% {
-          background-color: #ffffff;
+        .slogan {
+            color: #666;
+            font-size: 1.3rem;
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 10px;
         }
-        50% {
-          background-color: #ff9999;
+        .dark-mode .app-title, .dark-mode .panel-title, .dark-mode .slogan {
+            color: var(--dark-text);
         }
-        100% {
-          background-color: #ffffff;
+        .panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 36px 32px 28px 32px;
+            margin-bottom: 24px;
+            border: 1.5px solid #ffe0c9;
+            transition: background 0.4s, box-shadow 0.3s;
         }
-      }
-
-      @keyframes shake {
-        0% {
-          transform: translateX(0) translateZ(10px);
+        .dark-mode .panel {
+            background: var(--dark-card);
+            border-color: #444;
         }
-        25% {
-          transform: translateX(-5px) translateZ(10px);
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
         }
-        50% {
-          transform: translateX(5px) translateZ(10px);
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary);
         }
-        75% {
-          transform: translateX(-5px) translateZ(10px);
+        .input-area {
+            display: grid;
+            grid-template-columns: 270px 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 20px;
+            background: rgba(255, 250, 245, 0.7);
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(255,90,0,0.04);
+            padding: 18px 12px 18px 12px;
         }
-        100% {
-          transform: translateX(0) translateZ(10px);
+        .input-container label {
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 8px;
         }
-      }
-
-      .time-calculator {
-        position: fixed;
-        top: 300px;
-        right: 20px;
-        width: 280px;
-        background: linear-gradient(135deg, #ffe6cc, #fff5e6);
-        color: #222;
-        font-size: 16px;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        z-index: 3;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .time-calculator {
-        background: linear-gradient(135deg, #232526, #333);
-        color: #fff;
-      }
-
-      .time-calculator h3 {
-        font-size: 18px;
-        margin-bottom: 15px;
-        color: #ff6200;
-      }
-
-      .time-calculator input {
-        margin-bottom: 10px;
-        font-size: 14px;
-      }
-
-      .time-calculator button {
-        font-size: 14px;
-        padding: 10px;
-      }
-
-      .time-calculator #timeCalcResult {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #222;
-        background-color: #fff;
-        padding: 8px;
-        border-radius: 8px;
-        border: 2px dashed #ff6200;
-      }
-
-      .time-calculator #timeCalcResetCountdown {
-        margin-top: 10px;
-        color: #666;
-        font-size: 12px;
-        font-style: italic;
-      }
-
-      .time-calc-reminder {
-        position: fixed;
-        top: 460px;
-        right: -400px;
-        width: 280px;
-        background: linear-gradient(135deg, #ffcc99, #ffdb80);
-        color: #222;
-        font-size: 16px;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        transition: right 0.5s ease-in-out;
-        text-align: center;
-        z-index: 3;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .time-calc-reminder {
-        background: linear-gradient(135deg, #b34700, #ffcc99);
-        color: #fff;
-      }
-
-      .time-calc-reminder.show {
-        right: 20px;
-      }
-
-      .time-calc-reminder p {
-        font-weight: 600;
-      }
-
-      .time-calc-service-message {
-        position: fixed;
-        top: 510px;
-        right: -400px;
-        width: 280px;
-        background: linear-gradient(135deg, #ff9999, #ffcccc);
-        color: #222;
-        font-size: 14px;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        transition: right 0.5s ease-in-out;
-        text-align: center;
-        z-index: 3;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .time-calc-service-message {
-        background: linear-gradient(135deg, #333, #ffb366);
-        color: #fff;
-      }
-
-      .time-calc-service-message.show {
-        right: 20px;
-      }
-
-      .time-calc-service-message p {
-        font-weight: 600;
-      }
-
-      .time-calc-service-message .highlight {
-        font-weight: bold;
-        color: #ff3333;
-      }
-
-      .dark-mode .time-calc-service-message .highlight {
-        color: #ffd700;
-      }
-
-      .failed-trials {
-        position: fixed;
-        left: -400px;
-        top: 30%;
-        width: 280px;
-        background: linear-gradient(135deg, #ff9999, #ffcccc);
-        color: #222;
-        font-size: 16px;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        transition: left 0.5s ease-in-out;
-        z-index: 2;
-        text-align: left;
-        transform: translateZ(10px);
-      }
-
-      .dark-mode .failed-trials {
-        background: linear-gradient(135deg, #b34700, #ff9999);
-        color: #fff;
-      }
-
-      .failed-trials.show {
-        left: 20px;
-      }
-
-      .failed-trials h3 {
-        font-size: 22px;
-        margin-bottom: 15px;
-        text-align: center;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-      }
-
-      .failed-trials ul {
-        padding-left: 20px;
-        margin: 0;
-      }
-
-      .failed-trials ul li {
-        margin-bottom: 8px;
-        list-style: square;
-      }
-
-      .refund-sla-panel {
-        position: fixed;
-        bottom: 26%;
-        left: -400px;
-        width: 280px;
-        background: linear-gradient(135deg, #fff5e6, #ffe6cc);
-        color: #222;
-        font-size: 16px;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        z-index: 3;
-        transform: translateZ(10px);
-        transition: left 0.5s ease-in-out;
-      }
-
-      .dark-mode .refund-sla-panel {
-        background: linear-gradient(135deg, #232526, #333);
-        color: #ffd580;
-      }
-
-      .refund-sla-panel.show {
-        left: 20px;
-      }
-
-      .refund-sla-panel h3 {
-        font-size: 18px;
-        margin-bottom: 15px;
-        color: #ff6200;
-      }
-
-      .refund-sla-panel select {
-        width: 100%;
-        /*padding: 10px;*/
-        font-size: 14px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        background: #f9f9f9;
-        color: #222;
-        cursor: pointer;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        pointer-events: auto;
-      }
-
-      .dark-mode .refund-sla-panel select {
-        background: #2d2f31;
-        color: #fff;
-        border: 2px solid #444;
-      }
-
-      .refund-sla-panel select:focus {
-        border-color: #ff6200;
-        outline: none;
-        box-shadow: 0 0 8px rgba(255, 98, 0, 0.3);
-      }
-
-      .refund-sla-details {
-        position: absolute;
-        top: 100px;
-        left: 0;
-        right: 0;
-        width: 240px;
-        margin: 0 auto;
-        background: #fff;
-        color: #222;
-        font-size: 14px;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        transform: translateY(-20px);
-        opacity: 0;
-        transition: all 0.5s ease-in-out;
-        z-index: 4;
-        border: 2px dashed #ff6200;
-        direction: rtl;
-        text-align: right;
-      }
-
-      .dark-mode .refund-sla-details {
-        background: #232526;
-        color: #fff;
-        border-color: #ff6200;
-      }
-
-      .refund-sla-details.show {
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      .refund-sla-details p {
-        margin: 8px 0;
-        font-weight: 500;
-      }
-
-      .refund-sla-details .highlight {
-        font-weight: bold;
-        color: #ff6200;
-      }
-
-      .marquee {
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        color: white;
-        font-size: 16px;
-        padding: 10px 0;
-        overflow: hidden;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 999;
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      .dark-mode .marquee {
-        background: linear-gradient(90deg, #ff6200, #232526);
-        color: #ffd580;
-      }
-
-      .marquee-text {
-        display: inline-block;
-        white-space: nowrap;
-        padding-left: 100%;
-        animation: scroll 80s linear infinite;
-      }
-
-      @keyframes scroll {
-        0% {
-          transform: translateX(0);
+        .input-container label i {
+            margin-left: 6px;
+            color: var(--primary);
+            cursor: pointer;
         }
-        100% {
-          transform: translateX(-100%);
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            font-size: 1rem;
+            background-color: #fff;
+            transition: border-color 0.3s, background 0.3s;
         }
-      }
-
-      #orderTimers {
-        margin-top: 30px;
-      }
-
-      .service-selection {
-        display: flex;
-        justify-content: space-between;
-        margin: 20px 0 25px;
-        gap: 10px;
-      }
-
-      .service-option {
-        flex: 1;
-        text-align: center;
-        position: relative;
-        cursor: pointer;
-      }
-
-      .service-option input[type="checkbox"] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .service-option label {
-        display: block;
-        background-color: #f0f0f0;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        padding: 12px 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #444;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        text-align: center;
-      }
-
-      .dark-mode .service-option label {
-        background-color: #232526;
-        border: 2px solid #666;
-        color: #ffd580;
-      }
-
-      .service-option:nth-child(1) label {
-        color: #ff6200;
-      }
-
-      .service-option:nth-child(2) label {
-        color: #0066cc;
-      }
-
-      .service-option:nth-child(3) label {
-        color: #990099;
-      }
-
-      .service-option input[type="checkbox"]:checked + label {
-        background-color: #fff;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        transform: translateY(-3px) translateZ(5px);
-        border-color: currentColor;
-      }
-
-      .dark-mode .service-option input[type="checkbox"]:checked + label {
-        background-color: #333;
-        border-color: #ff6200;
-        color: #ff6200;
-      }
-
-      .service-option:nth-child(1) input[type="checkbox"]:checked + label {
-        background-color: #fff5e6;
-      }
-
-      .service-option:nth-child(2) input[type="checkbox"]:checked + label {
-        background-color: #e6f0ff;
-      }
-
-      .service-option:nth-child(3) input[type="checkbox"]:checked + label {
-        background-color: #f5e6ff;
-      }
-
-      #resetCountdown {
-        margin-top: 15px;
-        color: #666;
-        font-size: 14px;
-        font-style: italic;
-        text-align: center;
-      }
-
-      .required-message {
-        color: #ff3333;
-        font-size: 13px;
-        text-align: center;
-        margin-top: -10px;
-        margin-bottom: 10px;
-        font-style: italic;
-      }
-
-      .dark-mode .required-message {
-        color: #ffd580;
-      }
-
-      .order-timer-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #f0f0f0;
-        padding: 12px 15px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        transition: all 0.3s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .dark-mode .order-timer-item {
-        background: #232526;
-        color: #fff;
-      }
-
-      .order-timer-item.completed {
-        background-color: #e6ffcc;
-        color: #006600;
-        text-decoration: line-through;
-      }
-
-      .dark-mode .order-timer-item.completed {
-        background: #2d2f31;
-        color: #00cc00;
-      }
-
-      .order-timer-checkbox {
-        margin-right: 10px;
-        transform: scale(1.5);
-        cursor: pointer;
-      }
-
-      .dark-mode .order-timer-checkbox {
-        accent-color: #ff9a00;
-      }
-
-      .order-timer-content {
-        flex-grow: 1;
-        text-align: left;
-        margin-left: 8px;
-        display: flex;
-        align-items: center;
-      }
-
-      .timer-display {
-        margin-left: 10px;
-        font-weight: 600;
-      }
-
-      .timer-progress {
-        width: 50px;
-        height: 10px;
-        background-color: #ccc;
-        border-radius: 5px;
-        overflow: hidden;
-        margin-left: 10px;
-      }
-
-      .dark-mode .timer-progress {
-        background-color: #444;
-      }
-
-      .timer-progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-        transition: width 1s linear;
-      }
-
-      .dark-mode .timer-progress-bar {
-        background: linear-gradient(90deg, #ff6200, #ff9a00);
-      }
-
-      .timer-controls {
-        display: flex;
-        align-items: center;
-      }
-
-      .delete-timer {
-        background: none;
-        border: none;
-        color: #ff3333;
-        cursor: pointer;
-        font-size: 18px;
-        padding: 0 8px;
-        margin-left: 8px;
-        width: auto;
-      }
-
-      .dark-mode .delete-timer {
-        color: #ff4d4d;
-      }
-
-      .order-type-selection {
-        display: flex;
-        gap: 10px;
-        margin-top: 8px;
-      }
-      .order-type-selection input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .order-type-option {
-        flex: 1;
-        text-align: center;
-        background-color: #f0f0f0;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        padding: 12px 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #444;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        user-select: none;
-      }
-      .dark-mode .order-type-option {
-        background-color: #232526;
-        border: 2px solid #666;
-        color: #ffd580;
-      }
-      .order-type-selection input[type="radio"]:checked + .order-type-option {
-        background-color: #fff5e6;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        transform: translateY(-3px) translateZ(5px);
-        border-color: #ff6200;
-        color: #ff6200;
-      }
-      .dark-mode
-        .order-type-selection
-        input[type="radio"]:checked
-        + .order-type-option {
-        background-color: #333;
-        border-color: #ff6200;
-        color: #ff6200;
-      }
-
-      .dark-mode-toggle {
-        position: fixed;
-        top: 18px;
-        right: 24px;
-        z-index: 2000;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #232526 60%, #ff6200 100%);
-        color: #fff;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        font-size: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-      }
-      .dark-mode-toggle:hover {
-        background: linear-gradient(135deg, #ff6200 60%, #232526 100%);
-        color: #ffd700;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      }
-
-      .comp-reason-animated-popup {
-        display: none;
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.25);
-        z-index: 3000;
-        align-items: center;
-        justify-content: center;
-        animation: fadeInBg 0.4s;
-      }
-      .comp-reason-animated-popup.show {
-        display: flex;
-      }
-      .comp-reason-popup-content {
-        background: #fff;
-        color: #222;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-        padding: 32px 36px 24px 36px;
-        min-width: 320px;
-        max-width: 90vw;
-        text-align: center;
-        animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      }
-      .comp-reason-popup-content h3 {
-        font-size: 1.5em;
-        margin-bottom: 18px;
-        color: #ff6200;
-        letter-spacing: 1px;
-      }
-      .dark-mode .comp-reason-popup-content {
-        background: #232526;
-        color: #ffd580;
-      }
-      @keyframes popIn {
-        0% {
-          transform: scale(0.7);
-          opacity: 0;
+        .dark-mode textarea {
+            background: #232323;
+            color: var(--dark-text);
+            border-color: #444;
         }
-        80% {
-          transform: scale(1.05);
-          opacity: 1;
+        textarea:focus {
+            border-color: var(--primary);
+            outline: none;
         }
-        100% {
-          transform: scale(1);
-          opacity: 1;
+        .utility-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-      }
-      @keyframes fadeInBg {
-        0% {
-          background: rgba(0, 0, 0, 0);
+        .utility-buttons button {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            margin: 0;
         }
-        100% {
-          background: rgba(0, 0, 0, 0.25);
+        button, .fab-btn {
+            display: block;
+            width: 220px;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 auto;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(255,90,0,0.08);
         }
-      }
-
-      .contact-driver-popup {
-        display: none;
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.25);
-        z-index: 3000;
-        align-items: center;
-        justify-content: center;
-        animation: fadeInBg 0.4s;
-      }
-      .contact-driver-popup.show {
-        display: flex;
-      }
-      .contact-driver-popup-content {
-        background: #fff;
-        color: #222;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-        padding: 32px 36px 24px 36px;
-        min-width: 340px;
-        max-width: 95vw;
-        text-align: center;
-        animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      }
-      .contact-driver-popup-content h3 {
-        font-size: 1.3em;
-        margin-bottom: 18px;
-        color: #ff6200;
-        letter-spacing: 1px;
-      }
-      .dark-mode .contact-driver-popup-content {
-        background: #232526;
-        color: #ffd580;
-      }
-
-      .contact-driver-fab {
-        position: fixed;
-        left: 20px;
-        top: 10px; /* Adjust this value to be just above Failed Trials (which starts at top: 300px) */
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff6200 60%, #ffb366 100%);
-        color: #fff;
-        border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-        font-size: 2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 3500;
-        transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      }
-      .contact-driver-fab:hover {
-        background: linear-gradient(135deg, #ffb366 60%, #ff6200 100%);
-        color: #232526;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      }
-      @media (max-width: 600px) {
-        .contact-driver-fab {
-          top: 18px;
-          left: 18px;
-          width: 50px;
-          height: 50px;
-          font-size: 1.5em;
+        button:hover, .fab-btn:hover {
+            background-color: var(--primary-dark);
         }
-      }
-
-      .fab-btns-top-left {
-        position: fixed;
-        top: 0px; /* Flush with top */
-        left: 0px; /* Flush with left */
-        z-index: 4000;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px;
-      }
-      @media (max-width: 600px) {
-        .fab-btns-top-left {
-          top: 0px;
-          left: 0px;
-          gap: 6px;
-          padding: 4px;
+        button:active, .fab-btn:active {
+            transform: scale(0.98);
         }
-      }
-      .contact-driver-fab,
-      .sms-cst-fab {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff6200 60%, #ffb366 100%);
-        color: #fff;
-        border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-        font-size: 2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      }
-      .contact-driver-fab:hover,
-      .sms-cst-fab:hover {
-        background: linear-gradient(135deg, #ffb366 60%, #ff6200 100%);
-        color: #232526;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      }
-      @media (max-width: 600px) {
-        .fab-btns-top-left {
-          top: 10px;
-          left: 10px;
-          gap: 10px;
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
-      }
-
-      .sms-cst-popup {
-        display: none;
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.25);
-        z-index: 3000;
-        align-items: center;
-        justify-content: center;
-        animation: fadeInBg 0.4s;
-      }
-      .sms-cst-popup.show {
-        display: flex;
-      }
-      .sms-cst-popup-content {
-        background: #fff;
-        color: #222;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-        padding: 32px 36px 24px 36px;
-        min-width: 340px;
-        max-width: 95vw;
-        text-align: center;
-        animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      }
-      .sms-cst-popup-content h3 {
-        font-size: 1.3em;
-        margin-bottom: 18px;
-        color: #ff6200;
-        letter-spacing: 1px;
-      }
-      .dark-mode .sms-cst-popup-content {
-        background: #232526;
-        color: #ffd580;
-      }
-
-      .fab-btns-bottom-right {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 4000;
-        display: flex;
-        flex-direction: row; /* side by side */
-        gap: 16px;
-        transition: opacity 0.3s;
-        opacity: 0;
-        pointer-events: none;
-      }
-      .fab-btns-bottom-right.show {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      @media (max-width: 600px) {
-        .fab-btns-bottom-right {
-          bottom: 10px;
-          right: 10px;
-          gap: 8px;
+        button i, .fab-btn i {
+            margin-right: 7px;
         }
-      }
-
-      .floating-time-calc-btn {
-        position: fixed;
-        bottom: 60%;
-        right: 32px;
-        z-index: 200;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff6200 60%, #ffb366 100%);
-        color: #fff;
-        border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-        font-size: 2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      }
-      .floating-time-calc-btn:hover {
-        background: linear-gradient(135deg, #ffb366 60%, #ff6200 100%);
-        color: #232526;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      }
-
-      .floating-failed-trials-btn {
-        position: fixed;
-        top: 25%;
-        left: 32px;
-        z-index: 4101;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff3333 60%, #ffb366 100%);
-        color: #fff;
-        border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-        font-size: 2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      }
-      .floating-failed-trials-btn:hover {
-        background: linear-gradient(135deg, #ffb366 60%, #ff3333 100%);
-        color: #232526;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      }
-      @media (max-width: 600px) {
-        .floating-failed-trials-btn {
-          bottom: 70px;
-          left: 12px;
-          width: 44px;
-          height: 44px;
-          font-size: 1.3em;
+        .fab-btn {
+            position: fixed;
+            right: 32px;
+            bottom: 32px;
+            z-index: 1001;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            font-size: 2rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 24px rgba(255,90,0,0.18);
         }
-      }
-
-      .floating-refund-sla-btn {
-        position: fixed;
-        bottom: 32%;
-        left: 32px;
-        z-index: 4102;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ffd700 60%, #ffb366 100%);
-        color: #222;
-        border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-        font-size: 2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      }
-      .floating-refund-sla-btn:hover {
-        background: linear-gradient(135deg, #ffb366 60%, #ffd700 100%);
-        color: #18191a;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      }
-      @media screen and (max-width: 600px) {
-        .floating-time-calc-btn,
-        .floating-refund-sla-btn {
-          width: 44px;
-          height: 44px;
+        .fab-btn span {
+            display: none;
         }
-      }
+        .fab-btn:focus {
+            outline: 2px solid var(--primary-dark);
+        }
+        .table-wrapper {
+            padding: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 15px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--timeline-shadow);
+            background: #fff;
+            transition: background 0.4s;
+        }
+        .dark-mode table {
+            background: #232323;
+        }
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 1rem;
+        }
+        th {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+        }
+        tr {
+            background-color: white;
+            transition: background 0.2s;
+        }
+        .dark-mode tr {
+            background: #232323;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .dark-mode tr:nth-child(even) {
+            background: #2a2a2a;
+        }
+        tr:hover {
+            background-color: #ffe5d0;
+        }
+        .dark-mode tr:hover {
+            background: #333;
+        }
+        .timestamp {
+            white-space: nowrap;
+            color: #666;
+            font-weight: 500;
+        }
+        .dark-mode .timestamp {
+            color: #bbb;
+        }
+        .event {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        .event-dispatched { color: #2196f3; }
+        .event-queued { color: #e67e22; }
+        .event-notified { color: #27ae60; }
+        .event-accepted { color: #2ecc71; }
+        .event-cancelled { color: #e74c3c; }
+        .event-picked-up { color: #8e44ad; }
+        .event-near-pickup { color: var(--primary); }
+        .event-left-pickup { color: #9b59b6; }
+        .event-near-dropoff { color: #e67e22; }
+        .event-completed { color: #1abc9c; }
+        .event-scheduled { color: #f39c12; }
+        .instructions {
+            background-color: #fffbf7;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            border: 1.5px solid #ffe0c9;
+            font-size: 1.05rem;
+        }
+        .dark-mode .instructions {
+            background: #232323;
+            border-color: #444;
+            color: var(--dark-text);
+        }
+        .instruction-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .instruction-icon {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        .instruction-title {
+            color: var(--primary-dark);
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        .instructions li::marker {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .instruction-note {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ffd0b0;
+        }
+        .note-icon {
+            color: var(--primary);
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        #result-container, #additional-timeline-container {
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #result-container.visible, #additional-timeline-container.visible {
+            opacity: 1;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 18px 18px 12px;
+            margin-top: 18px;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .dark-mode .summary-card {
+            background: var(--dark-card);
+        }
+        .summary-icon {
+            font-size: 1.7rem;
+            color: var(--primary);
+            margin-right: 14px;
+        }
+        .summary-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+        .dark-mode .summary-title {
+            color: var(--dark-text);
+        }
+        .summary-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .summary-info {
+            margin-left: 8px;
+            color: #888;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .status-button {
+            padding: 10px 22px;
+            background-color: #e8ecef;
+            border: 1.5px solid #d1d5da;
+            border-radius: 7px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+            position: relative;
+            top: 0;
+        }
+        .status-button:hover {
+            background-color: #ffd6c2;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .status-button:active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(1px);
+        }
+        .status-button.selected {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: var(--primary-dark);
+        }
+        .input-group {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .input-group label {
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+        .input-group label i {
+            margin-left: 6px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .delivery-time-input {
+            padding: 10px;
+            width: 120px;
+            border: 1.5px solid #d1d5da;
+            border-radius: 7px;
+            font-size: 1rem;
+            background-color: #e8ecef;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+            position: relative;
+            top: 0;
+            text-align: center;
+        }
+        .delivery-time-input:hover {
+            background-color: #ffd6c2;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .delivery-time-input:focus {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: var(--primary);
+            outline: none;
+            transform: translateY(0);
+        }
+        .dark-mode .delivery-time-input {
+            background: #232323;
+            color: var(--dark-text);
+            border-color: #444;
+        }
+        .dark-mode .status-button {
+            background: #232323;
+            color: var(--dark-text);
+            border-color: #444;
+        }
+        .dark-mode .status-button.selected {
+            background: var(--primary);
+            color: #fff;
+        }
+        .dark-mode .status-button:hover {
+            background: #333;
+        }
+        .dark-mode .input-container label, .dark-mode .input-group label {
+            color: var(--dark-text);
+        }
+        .dark-mode .summary-value {
+            color: #ffb380;
+        }
+        .dark-mode .summary-icon {
+            color: #ffb380;
+        }
+        .dark-mode .summary-info {
+            color: #bbb;
+        }
+        .dark-mode .fab-btn {
+            background: var(--primary-dark);
+            color: #fff;
+        }
+        .dark-mode .fab-btn:hover {
+            background: var(--primary);
+        }
+        .dark-mode .utility-buttons button {
+            background: #232323;
+            color: var(--dark-text);
+            border-color: #444;
+        }
+        .dark-mode .utility-buttons button:hover {
+            background: #333;
+        }
+        .dark-mode .footer {
+            color: #bbb;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #888;
+            font-size: 0.98rem;
+            letter-spacing: 0.5px;
+        }
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.7);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .dark-mode .spinner-overlay {
+            background: rgba(30,30,30,0.7);
+        }
+        .spinner {
+            font-size: 3rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 14px;
+            padding: 32px 28px 24px 28px;
+            max-width: 480px;
+            width: 90vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            position: relative;
+        }
+        .dark-mode .modal-content {
+            background: #232323;
+            color: var(--dark-text);
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+        }
+        .dark-mode .modal-close {
+            color: #bbb;
+        }
+        .modal h2 {
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        .modal ul {
+            margin-left: 18px;
+        }
+        .modal li {
+            margin-bottom: 8px;
+        }
+        @media (max-width: 1100px) {
+            .input-area {
+                grid-template-columns: 1fr 1fr;
+            }
+            #delay-summary {
+                grid-column: 1 / span 2;
+                margin-bottom: 18px;
+                margin-right: 0;
+            }
+        }
+        @media (max-width: 768px) {
+            .input-area {
+                grid-template-columns: 1fr;
+                padding: 10px 4px;
+                gap: 12px;
+            }
+            #delay-summary {
+                margin-bottom: 12px;
+                margin-right: 0;
+            }
+        }
+        #delay-summary {
+            min-width:220px;
+            max-width:260px;
+            margin-right:18px;
+            background: linear-gradient(120deg, #fff7f0 0%, #ffe0c9 100%);
+            border-radius:18px;
+            box-shadow:0 4px 18px rgba(255,90,0,0.10);
+            padding:24px 18px 18px 18px;
+            display:flex;
+            flex-direction:column;
+            gap:16px;
+            border: 1.5px solid #ffd6c2;
+        }
+        .dark-mode #delay-summary {
+            background: linear-gradient(120deg, #232323 0%, #333 100%);
+            border-color: #444;
+        }
+        #delay-summary h3 {
+            font-size:1.18rem;
+            font-weight:800;
+            color:var(--primary-dark);
+            margin-bottom:12px;
+            letter-spacing:0.5px;
+        }
+        .dark-mode #delay-summary h3 {
+            color: #ffb380;
+        }
+        #delay-summary ul {
+            list-style:none;
+            padding:0;
+            margin:0;
+        }
+        #delay-summary li {
+            margin-bottom:12px;
+            display:flex;
+            align-items:center;
+            font-size:1.05rem;
+            font-weight:500;
+            color: #333;
+            border-radius: 8px;
+            padding: 7px 8px 7px 0;
+            transition: background 0.2s, color 0.2s;
+        }
+        #delay-summary li:last-child {
+            margin-bottom:0;
+        }
+        #delay-summary li:hover {
+            background: #fff3e6;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+        .dark-mode #delay-summary li {
+            color: #f1f1f1;
+        }
+        .dark-mode #delay-summary li:hover {
+            background: #333;
+            color: #ffb380;
+        }
+        #dark-mode-toggle {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            z-index: 1100;
+            background: var(--secondary);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 28px 12px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s, color 0.3s, box-shadow 0.2s, transform 0.1s;
+            cursor: pointer;
+        }
+        #dark-mode-toggle:hover {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(255,90,0,0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+        #dark-mode-toggle:active {
+            background: var(--primary-dark);
+            color: #fff;
+            transform: scale(0.98);
+        }
+        .dark-mode #dark-mode-toggle {
+            background: var(--primary-dark);
+            color: #fff;
+        }
+        #rider-pickup-analysis {
+            position:fixed;
+            top:120px;
+            right:32px;
+            z-index:1200;
+            width:270px;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 4px 18px rgba(255,90,0,0.10);
+            padding:18px 16px 16px 16px;
+            display:none;
+        }
+        #rider-pickup-analysis h3 {
+            font-size:1.08rem;
+            font-weight:700;
+            color:var(--primary-dark);
+            margin-bottom:10px;
+        }
+        #rider-pickup-analysis table {
+            width:100%;
+            font-size:0.98rem;
+        }
+        #rider-pickup-analysis tr {
+            margin-bottom:10px;
+        }
+        #rider-pickup-analysis td {
+            padding:5px 0;
+        }
+        #rider-pickup-analysis td:first-child {
+            font-weight:700;
+        }
+        #rider-pickup-analysis td:last-child {
+            text-align:right;
+        }
+        /* Add animation for cancellation reason pop-up */
+        @keyframes popFade {
+            0% { transform: scale(0.95) translateY(20px); opacity: 0; }
+            60% { transform: scale(1.05) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .cancellation-pop {
+            animation: popFade 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 0 0 4px #ff5a0033;
+            background: #fff7f0 !important;
+        }
+    </style>
         `;
         break;
         case 3:
